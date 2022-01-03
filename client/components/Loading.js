@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 const { Spinner } = ReactBootstrap;
 
 // eslint-disable-next-line no-undef
-class Loading extends React.Component {
+export default class Loading extends React.Component {
   render() {
     const { variant, animation } = this.props;
     return (
@@ -23,5 +23,3 @@ Loading.propTypes = {
   variant: PropTypes.string,
   animation: PropTypes.string,
 };
-
-export default Loading;

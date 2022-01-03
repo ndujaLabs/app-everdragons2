@@ -32,7 +32,11 @@ class Base extends Common {
   endTimeout(func, time) {
     clearTimeout(this.timerId);
     this.timerId = null;
-    func();
+    try {
+      func();
+    } catch (e) {
+      // probably component has been dismounted
+    }
   }
 
   async sleep(millis) {

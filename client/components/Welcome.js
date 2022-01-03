@@ -1,7 +1,8 @@
 // eslint-disable-next-line no-undef
 const { Redirect } = ReactRouterDOM;
+
 // eslint-disable-next-line no-undef
-const { Container, Button } = ReactBootstrap;
+const { Container, Button, Row, Col } = ReactBootstrap;
 
 import Base from "./Base";
 import Loading from "./Loading";
@@ -55,17 +56,26 @@ export default class Welcome extends Base {
     } else if (needAuthentication) {
       return (
         <Container style={{ marginTop: 100 }}>
-          <div className={"noTokens m0Auto"}>
-            <div className={"welcometo"}>Welcome to the Everdragons2 App</div>
-
-            <Button
-              size={"lg"}
-              variant={"warning"}
-              onClick={() => (window.location = "/auth/discord/login")}
-            >
-              Connect your Discord
-            </Button>
-          </div>
+          <Row>
+            <Col className={"centered"}>
+              <img
+                src={"/images/new-everdragons2logo.png"}
+                className={"ed2logoSmall"}
+              />
+            </Col>
+          </Row>
+          <Row>
+            <Col className={"centered"}>
+              <Button
+                style={{ marginTop: 80 }}
+                size={"lg"}
+                // variant={"warning"}
+                onClick={() => (window.location = "/auth/discord/login")}
+              >
+                Connect to Discord
+              </Button>
+            </Col>
+          </Row>
         </Container>
       );
     } else {

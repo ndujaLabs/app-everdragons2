@@ -844,6 +844,10 @@ img.pc90 {
     font-size: 1.4rem;
 }
 
+#footer {
+    padding: 0 !important;
+}
+
 #footer .item {
     margin: 0 8px;
 }
@@ -859,4 +863,43 @@ img.pc90 {
 
 .pointer {
     cursor: pointer;
+}
+
+.ed2logoSmall {
+    width: 300px;
+}
+
+.mt24 {
+    margin-top: 24px;
+}
+
+.m32 {
+    margin: 32px;
+}
+
+.input-group-text {
+    padding-right: 2px !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+}
+
+.input-group > .custom-select:not(:first-child),
+.input-group > .form-control:not(:first-child) {
+    padding-left: 1px !important;
+}
+
+.coord {
+    color: darkblue;
+    padding-right: 12px;
+}
+
+input::placeholder {
+    color: #ccc !important;
+}
+
+.error {
+    color: crimson;
+    font-weight: bold;
+    font-size: 90%;
+    padding: 10px 0 18px;
 }

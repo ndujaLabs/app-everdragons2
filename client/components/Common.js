@@ -11,6 +11,7 @@ export default class Common extends React.Component {
 
   bindMany(methods) {
     for (let m of methods) {
+      // console.log(m)
       this[m] = this[m].bind(this);
     }
   }

@@ -6,20 +6,24 @@ const queryString = require("query-string");
 const fetch = (...args) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
-const baseUri =
-  process.env.NODE_ENV === "development"
-    ? "http://app.everdragons2.com.local"
-    : "https://app.everdragons2.com";
-
 const clientId = process.env.CLIENT_ID;
 const clientSecret = process.env.CLIENT_SECRET;
-const redirectUri = `${baseUri}/auth/discord/callback`;
+
+function getRedirectUri(req) {
+  const baseUri =
+    req.hostname === "localhost"
+      ? "http://localhost:6700"
+      : req.hostname === "app.everdragons2.com.local"
+      ? "http://app.everdragons2.com.local"
+      : "https://app.everdragons2.com";
+  return `${baseUri}/auth/discord/callback`;
+}
 
 router.get("/discord/login", (req, res) => {
   const oauth = new DiscordOauth2({
     clientId,
     clientSecret,
-    redirectUri,
+    redirectUri: getRedirectUri(req),
   });
   const url = oauth.generateAuthUrl({
     scope: ["identify", "guilds"],
@@ -41,7 +45,7 @@ router.get("/discord/callback", async (req, res) => {
         client_secret: clientSecret,
         code,
         grant_type: "authorization_code",
-        redirect_uri: redirectUri,
+        redirect_uri: getRedirectUri(req),
         scope: "identify",
       }),
       headers: {

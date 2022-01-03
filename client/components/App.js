@@ -8,7 +8,7 @@ const ethers = require("ethers");
 import ls from "local-storage";
 import { Contract } from "@ethersproject/contracts";
 import config from "../config";
-
+import clientApi from "../utils/ClientApi";
 import Common from "./Common";
 import Header from "./Header";
 import Home from "./Home";
@@ -77,7 +77,9 @@ export default class App extends Common {
 
   async componentDidMount() {
     window.addEventListener("resize", this.updateDimensions.bind(this));
-    // await this.connect(true)
+    if (this.state.Store.connectedBefore) {
+      await this.connect(true);
+    }
   }
 
   async setWallet() {
@@ -99,6 +101,13 @@ export default class App extends Common {
         connectedNetwork,
         networkNotSupported,
       });
+      this.setStore(
+        {
+          connectedBefore: true,
+        },
+        true
+      );
+      clientApi.setConnectedWallet(connectedWallet, chainId);
     } catch (e) {
       // console.log(e)
       window.location.reload();

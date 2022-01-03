@@ -213,33 +213,33 @@ export default class Header extends Base {
         </Navbar.Collapse>
 
         <Navbar.Collapse className="justify-content-end">
-          <Navbar.Text className={"socialLinks2"}>
-            <a
-              className="item"
-              target="_blank"
-              href="https://twitter.com/everdragons2"
-              rel="noreferrer"
-            >
-              <i className="fab fa-twitter" />{" "}
-              <span className="roboto300">Twitter</span>
-            </a>
-            <a
-              className="item"
-              href={"https://discord.gg/AzfFnUjrnG"}
-              rel="noreferrer"
-            >
-              <i className="fab fa-discord" />{" "}
-              <span className="roboto300">Discord</span>
-            </a>
-            <a
-              className="item"
-              href={"https://medium.com/ndujalabs"}
-              rel="noreferrer"
-            >
-              <i className="fab fa-medium" />{" "}
-              <span className="roboto300">Blog</span>
-            </a>
-          </Navbar.Text>
+          {/*<Navbar.Text className={"socialLinks2"}>*/}
+          {/*  <a*/}
+          {/*    className="item"*/}
+          {/*    target="_blank"*/}
+          {/*    href="https://twitter.com/everdragons2"*/}
+          {/*    rel="noreferrer"*/}
+          {/*  >*/}
+          {/*    <i className="fab fa-twitter" />{" "}*/}
+          {/*    <span className="roboto300">Twitter</span>*/}
+          {/*  </a>*/}
+          {/*  <a*/}
+          {/*    className="item"*/}
+          {/*    href={"https://discord.gg/AzfFnUjrnG"}*/}
+          {/*    rel="noreferrer"*/}
+          {/*  >*/}
+          {/*    <i className="fab fa-discord" />{" "}*/}
+          {/*    <span className="roboto300">Discord</span>*/}
+          {/*  </a>*/}
+          {/*  <a*/}
+          {/*    className="item"*/}
+          {/*    href={"https://medium.com/ndujalabs"}*/}
+          {/*    rel="noreferrer"*/}
+          {/*  >*/}
+          {/*    <i className="fab fa-medium" />{" "}*/}
+          {/*    <span className="roboto300">Blog</span>*/}
+          {/*  </a>*/}
+          {/*</Navbar.Text>*/}
 
           {this.Store.discordUser ? (
             <Navbar.Text>
