@@ -1,22 +1,32 @@
+import InputSolution from "./sections/InputSolution";
+
 // eslint-disable-next-line no-undef
 const { Redirect } = ReactRouterDOM;
 
 import * as Scroll from "react-scroll";
 import queryString from "query-string";
+import { ethers } from "ethers";
 
 // eslint-disable-next-line no-undef
 const { Container, Row, Col } = ReactBootstrap;
 
 import Base from "./Base";
-import InputSolution from "./sections/InputSolution";
 
 export default class Home extends Base {
   constructor(props) {
     super(props);
     const qs = queryString.parse(window.location.search);
-    this.state = {
-      qs,
-    };
+    if (
+      qs["agdaroth-sent-me"] &&
+      ethers.utils.id(qs["agdaroth-sent-me"]) ===
+        "0x754806243f179623bd2c9ac7fb8ea63c12e5ddcd29a983176bf1c44c09e987e7"
+    ) {
+      this.state = {
+        nice: true,
+      };
+    } else {
+      this.state = {};
+    }
   }
 
   componentDidMount() {
@@ -44,7 +54,17 @@ export default class Home extends Base {
           </Col>
         </Row>
         {connectedWallet ? (
-          <InputSolution Store={this.Store} setStore={this.setStore} />
+          this.state.nice ? (
+            <InputSolution Store={this.Store} setStore={this.setStore} />
+          ) : (
+            <Row>
+              <Col>
+                <h2 className={"centered mt24"}>
+                  It looks like you came here too early :-(
+                </h2>
+              </Col>
+            </Row>
+          )
         ) : (
           <Row>
             <Col>

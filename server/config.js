@@ -28,8 +28,6 @@ const pgData = {
   database: process.env.POSTGRES_DB || "ed2arg",
 };
 
-console.log(pgData);
-
 module.exports = {
   isLocal,
   pgConf,
