@@ -164,6 +164,7 @@ export default class InputSolution extends Base {
               size={"lg"}
               disabled={this.state.submitting}
               onClick={this.submit}
+              style={{ marginBottom: 100 }}
             >
               {this.state.submitting ? (
                 <div>

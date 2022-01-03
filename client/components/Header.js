@@ -4,8 +4,6 @@ const { Navbar, Nav, Button } = ReactBootstrap;
 // eslint-disable-next-line no-undef
 const { Link } = ReactRouterDOM;
 
-import * as Scroll from "react-scroll";
-
 import Base from "./Base";
 
 export default class Header extends Base {
@@ -126,78 +124,15 @@ export default class Header extends Base {
         <Navbar.Collapse id="navbarScroll">
           {this.state.pathname === "/" ? (
             <Nav className="mr-auto my-2 my-lg-0" navbarScroll>
-              <Scroll.Link
-                offset={-80}
-                spy={true}
-                smooth={true}
-                to="intro"
-                onClick={this.setExpanded}
-              >
-                Intro
-              </Scroll.Link>
               {/*<Scroll.Link*/}
               {/*  offset={-80}*/}
               {/*  spy={true}*/}
               {/*  smooth={true}*/}
-              {/*  to="story"*/}
+              {/*  to="intro"*/}
               {/*  onClick={this.setExpanded}*/}
               {/*>*/}
-              {/*  Story*/}
+              {/*  Intro*/}
               {/*</Scroll.Link>*/}
-              {/*/!*<Scroll.Link*!/*/}
-              {/*/!*  offset={-80}*!/*/}
-              {/*/!*  spy={true} smooth={true} to='art' onClick={this.setExpanded}>Art</Scroll.Link>*!/*/}
-              {/*<Scroll.Link*/}
-              {/*  offset={-80}*/}
-              {/*  spy={true}*/}
-              {/*  smooth={true}*/}
-              {/*  to="roadmap"*/}
-              {/*  onClick={this.setExpanded}*/}
-              {/*>*/}
-              {/*  Roadmap*/}
-              {/*</Scroll.Link>*/}
-              {/*<Scroll.Link*/}
-              {/*  offset={-80}*/}
-              {/*  spy={true}*/}
-              {/*  smooth={true}*/}
-              {/*  to="sale"*/}
-              {/*  onClick={this.setExpanded}*/}
-              {/*>*/}
-              {/*  Sale*/}
-              {/*</Scroll.Link>*/}
-              {/*<Scroll.Link*/}
-              {/*  offset={-80}*/}
-              {/*  spy={true}*/}
-              {/*  smooth={true}*/}
-              {/*  to="faq"*/}
-              {/*  onClick={this.setExpanded}*/}
-              {/*>*/}
-              {/*  FAQ*/}
-              {/*</Scroll.Link>*/}
-              {/*/!*<Scroll.Link*!/*/}
-              {/*/!*  offset={-80}*!/*/}
-              {/*/!*  spy={true} smooth={true} to='drops' onClick={this.setExpanded}>Drops</Scroll.Link>*!/*/}
-              {/*<Scroll.Link*/}
-              {/*  offset={-80}*/}
-              {/*  spy={true}*/}
-              {/*  smooth={true}*/}
-              {/*  to="origins"*/}
-              {/*  onClick={this.setExpanded}*/}
-              {/*>*/}
-              {/*  Origins*/}
-              {/*</Scroll.Link>*/}
-              {/*<Scroll.Link*/}
-              {/*  offset={-80}*/}
-              {/*  spy={true}*/}
-              {/*  smooth={true}*/}
-              {/*  to="team"*/}
-              {/*  onClick={this.setExpanded}*/}
-              {/*>*/}
-              {/*  Team*/}
-              {/*</Scroll.Link>*/}
-              {/*<Scroll.Link*/}
-              {/*  offset={-80}*/}
-              {/*  spy={true} smooth={true} to='ed'>ED Original</Scroll.Link>*/}
             </Nav>
           ) : (
             <Nav
