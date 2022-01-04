@@ -115,8 +115,11 @@ export default class InputSolution extends Base {
             <Col>
               <h2 className={"mt24"}>The solutions are correct!</h2>
               <div className={"centered m32"}>
-                You rank #{score} in the list. If that is less than 104, you got
-                an egg.
+                You rank #{score} in the list.
+                If that is less than 104, and you created your Discord account
+                before January 1st, 2022, you got an egg.
+                If you rank more than 104, you can still get an egg
+                if people ahead of you are disqualified for any reason.
               </div>
             </Col>
           </Row>
