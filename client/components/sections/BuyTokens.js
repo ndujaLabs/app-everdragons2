@@ -58,7 +58,9 @@ export default class BuyTokens extends Base {
       } else if (value > 10) {
         state.errors.amount = "You cannot buy more than 10 tokens at once";
       } else {
-        state.total = parseFloat((parseFloat(this.state.price) * value).toString().substring(0,5));
+        state.total = parseFloat(
+          (parseFloat(this.state.price) * value).toString().substring(0, 5)
+        );
       }
     }
     state[name] = value;

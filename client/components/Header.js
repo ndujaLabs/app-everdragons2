@@ -120,7 +120,10 @@ export default class Header extends Base {
         className={"roboto"}
       >
         <Navbar.Brand href="https://everdragons2.com">
-          <img src={"/images/everDragons2Icon.png"} style={{ height: 40 }} />
+          <img
+            src={"/images/everDragons2Icon.png"}
+            style={{ height: 40, margin: "0 8px" }}
+          />
         </Navbar.Brand>
         <Navbar.Toggle
           aria-controls="basic-navbar-nav"
