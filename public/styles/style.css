@@ -669,6 +669,9 @@ h2 {
     height: 40px !important;
 }
 
+.mt4 {
+    margin-top: 4px !important;
+}
 /*.carousel-item {*/
 /*    position: relative;*/
 /*    display: none;*/
@@ -881,6 +884,7 @@ img.pc90 {
 
 .ed2logoSmall {
     width: 300px;
+    margin-bottom: 32px;
 }
 
 .mt24 {

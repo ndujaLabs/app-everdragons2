@@ -77,7 +77,6 @@ export default class BuyTokens extends Base {
       this.state.price || ethers.utils.formatEther(await GenesisFarm.price());
     const nextTokenId = (await GenesisFarm.nextTokenId()).toNumber();
     const minted = nextTokenId - 351;
-    const reserved = Math.ceil((350 * 100) / 600);
     const progress = Math.ceil((minted * 100) / 600);
     const balance = (
       await Everdragons2Genesis.balanceOf(this.Store.connectedWallet)
@@ -88,7 +87,6 @@ export default class BuyTokens extends Base {
     );
     this.setState({
       price,
-      reserved,
       minted,
       progress,
       balance,
@@ -116,6 +114,7 @@ export default class BuyTokens extends Base {
           congratulations: true,
           submitting: undefined,
           amount: 0,
+          total: 0,
         });
         this.getValues();
       } catch (e) {
@@ -162,7 +161,6 @@ export default class BuyTokens extends Base {
       progress,
       error,
       minted,
-      reserved,
       balance,
     } = this.state;
     return (
@@ -176,7 +174,7 @@ export default class BuyTokens extends Base {
                 <ProgressBar
                   striped
                   variant="success"
-                  now={reserved}
+                  now={59}
                   label={`350 tokens reserved`}
                   key={1}
                 />
@@ -190,9 +188,11 @@ export default class BuyTokens extends Base {
                   }}
                 />
               </ProgressBar>
-              <div className={"underProgress centered"}>
-                {250 - minted} available tokens
-              </div>
+              {price ? (
+                <div className={"underProgress centered"}>
+                  {250 - minted} available tokens
+                </div>
+              ) : null}
             </div>
           </Col>
           <Col lg={2}></Col>
@@ -211,8 +211,11 @@ export default class BuyTokens extends Base {
           <Row>
             <Col lg={2}></Col>
             <Col lg={8}>
-              <div className={"textBlock centered"} style={{ padding: 16 }}>
-                Congratulations, you own {balance} E2 NFTs
+              <div
+                className={"textBlock centered"}
+                style={{ padding: 16, backgroundColor: "#cf9" }}
+              >
+                Congratulations, you own {balance} E2GT
               </div>
             </Col>
             <Col lg={2}></Col>
@@ -231,7 +234,7 @@ export default class BuyTokens extends Base {
               <div style={{ clear: "both" }}>Total price {total} MATIC</div>
             ) : null}
           </Col>
-          <Col>
+          <Col className={"mt4"}>
             {submitting ? (
               <div>
                 <div>{submitting}</div>
@@ -240,7 +243,13 @@ export default class BuyTokens extends Base {
                 </div>
               </div>
             ) : (
-              <Button size={"lg"} disabled={submitting} onClick={this.submit}>
+              <Button
+                size={"lg"}
+                disabled={submitting}
+                onClick={this.submit}
+                className={"shortInput"}
+                variant={'success'}
+              >
                 Buy now!
               </Button>
             )}

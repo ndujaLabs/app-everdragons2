@@ -35,13 +35,10 @@ export default class Home extends Base {
       <Container style={{ marginTop: 100 }}>
         <Row>
           <Col className={"centered"}>
-            <Scroll.Element name="intro">
               <img
                 src={"/images/new-everdragons2logo.png"}
                 className={"ed2logoSmall"}
               />
-              {/*<img src={'/images/everDragons2Logo2.png'} className={'ed2logo'}/>*/}
-            </Scroll.Element>
           </Col>
         </Row>
         {connectedWallet ? (
