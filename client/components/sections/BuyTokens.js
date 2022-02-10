@@ -176,7 +176,7 @@ export default class BuyTokens extends Base {
                   striped
                   variant="success"
                   now={59}
-                  label={`350 tokens reserved`}
+                  label={"350 tokens reserved"}
                   key={1}
                 />
                 <ProgressBar
@@ -191,7 +191,8 @@ export default class BuyTokens extends Base {
               </ProgressBar>
               {price ? (
                 <div className={"underProgress centered"}>
-                  {250 - minted} available tokens
+                  {minted < 250 ? <span>{250 - minted} available tokens</span>
+                  : "Sold out."}
                 </div>
               ) : null}
             </div>
@@ -231,39 +232,41 @@ export default class BuyTokens extends Base {
           </Row>
         ) : null}
 
-        <Row>
-          <Col style={{ textAlign: "right" }}>
-            <FormGroup
-              name={"amount"}
-              thiz={this}
-              placeholder={"Amount of tokens"}
-              divCls={"shortInput floatRight"}
-            />
-            {total > 0 ? (
-              <div style={{ clear: "both" }}>Total price {total} MATIC</div>
-            ) : null}
-          </Col>
-          <Col className={"mt4"}>
-            {submitting ? (
-              <div>
-                <div>{submitting}</div>
-                <div style={{ clear: "both" }}>
-                  <Loading />
+        {minted < 250 ? (
+          <Row>
+            <Col style={{ textAlign: "right" }}>
+              <FormGroup
+                name={"amount"}
+                thiz={this}
+                placeholder={"Amount of tokens"}
+                divCls={"shortInput floatRight"}
+              />
+              {total > 0 ? (
+                <div style={{ clear: "both" }}>Total price {total} MATIC</div>
+              ) : null}
+            </Col>
+            <Col className={"mt4"}>
+              {submitting ? (
+                <div>
+                  <div>{submitting}</div>
+                  <div style={{ clear: "both" }}>
+                    <Loading />
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <Button
-                size={"lg"}
-                disabled={submitting}
-                onClick={this.submit}
-                className={"shortInput"}
-                variant={"success"}
-              >
-                Buy now!
-              </Button>
-            )}
-          </Col>
-        </Row>
+              ) : (
+                <Button
+                  size={"lg"}
+                  disabled={submitting}
+                  onClick={this.submit}
+                  className={"shortInput"}
+                  variant={"success"}
+                >
+                  Buy now!
+                </Button>
+              )}
+            </Col>
+          </Row>
+        ) : null}
         {error ? (
           <Row>
             <Col>
@@ -276,29 +279,29 @@ export default class BuyTokens extends Base {
         /// ADMIN
         */}
 
-        {isOwner ? (
-          <Row style={{ marginTop: 48 }}>
-            <Col style={{ textAlign: "right" }}>
-              <FormGroup
-                name={"amount2"}
-                thiz={this}
-                placeholder={"Amount"}
-                divCls={"shortInput floatRight"}
-              />
-              <FormGroup
-                name={"address"}
-                thiz={this}
-                placeholder={"Address"}
-                divCls={"shortInput floatRight"}
-              />
-            </Col>
-            <Col>
-              <Button size={"lg"} onClick={this.submit2}>
-                Get!
-              </Button>
-            </Col>
-          </Row>
-        ) : null}
+        {/*{isOwner ? (*/}
+        {/*  <Row style={{ marginTop: 48 }}>*/}
+        {/*    <Col style={{ textAlign: "right" }}>*/}
+        {/*      <FormGroup*/}
+        {/*        name={"amount2"}*/}
+        {/*        thiz={this}*/}
+        {/*        placeholder={"Amount"}*/}
+        {/*        divCls={"shortInput floatRight"}*/}
+        {/*      />*/}
+        {/*      <FormGroup*/}
+        {/*        name={"address"}*/}
+        {/*        thiz={this}*/}
+        {/*        placeholder={"Address"}*/}
+        {/*        divCls={"shortInput floatRight"}*/}
+        {/*      />*/}
+        {/*    </Col>*/}
+        {/*    <Col>*/}
+        {/*      <Button size={"lg"} onClick={this.submit2}>*/}
+        {/*        Get!*/}
+        {/*      </Button>*/}
+        {/*    </Col>*/}
+        {/*  </Row>*/}
+        {/*) : null}*/}
       </div>
     );
   }
