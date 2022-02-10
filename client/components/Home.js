@@ -1,4 +1,4 @@
-import BuyTokens from "./sections/BuyTokens";
+// import BuyTokens from "./sections/BuyTokens";
 
 // eslint-disable-next-line no-undef
 // const { Redirect } = ReactRouterDOM;
@@ -43,7 +43,14 @@ export default class Home extends Base {
         </Row>
         {connectedWallet ? (
           connectedNetwork ? (
-            <BuyTokens Store={this.Store} setStore={this.setStore} />
+            // <BuyTokens Store={this.Store} setStore={this.setStore} />
+            <Row>
+              <Col>
+                <h2 className={"centered mt24"}>
+                  The sale will start Friday, February 11th, at 10 am PST
+                </h2>
+              </Col>
+            </Row>
           ) : (
             <Row>
               <Col>
@@ -52,7 +59,7 @@ export default class Home extends Base {
                   <br />
                   <Ab
                     label={"Click here to switch/configure it"}
-                    onClick={() => switchTo(80001)}
+                    onClick={() => switchTo(137)}
                   />
                   .
                 </h2>
