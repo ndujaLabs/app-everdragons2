@@ -12,7 +12,7 @@ import FormGroup from "../FormGroup";
 import Base from "../Base";
 import Loading from "../Loading";
 import { ethers } from "ethers";
-import { decodeMetamaskError } from "../../utils/network";
+import { decodeMetamaskError } from "../../utils/networkUtils";
 import Address from "../../utils/Address";
 
 export default class BuyTokens extends Base {

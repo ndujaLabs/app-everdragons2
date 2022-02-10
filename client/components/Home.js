@@ -6,7 +6,7 @@ import BuyTokens from "./sections/BuyTokens";
 import * as Scroll from "react-scroll";
 // import queryString from "query-string";
 // import { ethers } from "ethers";
-import { switchTo } from "../utils/network";
+import { switchTo } from "../utils/networkUtils";
 // eslint-disable-next-line no-undef
 import { Container, Row, Col } from "react-bootstrap";
 
