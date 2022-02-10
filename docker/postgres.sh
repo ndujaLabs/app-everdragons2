@@ -3,7 +3,7 @@
 source .env && docker run -d \
     --name ed2-postgres \
     --restart unless-stopped \
-    -p 5432:5432 \
+    -p 5433:5432 \
     -v $PGDATA:/var/lib/postgresql/data/pgdata \
     -e PGDATA=/var/lib/postgresql/data/pgdata \
     -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \

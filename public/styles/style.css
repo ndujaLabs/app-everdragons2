@@ -655,6 +655,20 @@ h2 {
     float: right;
 }
 
+.shortInput {
+    width: 60%;
+}
+
+.padded {
+    padding-top: 24px;
+    padding-bottom: 24px;
+}
+
+.progress {
+    /*background-color: coral !important;*/
+    height: 40px !important;
+}
+
 /*.carousel-item {*/
 /*    position: relative;*/
 /*    display: none;*/
@@ -901,5 +915,10 @@ input::placeholder {
     color: crimson;
     font-weight: bold;
     font-size: 90%;
-    padding: 10px 0 18px;
+    /*padding: 10px 0 18px;*/
+}
+
+.underProgress {
+    font-size: 1.8rem;
+    padding: 6px 0 24px;
 }

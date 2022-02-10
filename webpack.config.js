@@ -38,7 +38,7 @@ const config = {
     react: "React",
     "react-dom": "ReactDOM",
     "react-router-dom": "ReactRouterDOM",
-    "react-bootstrap": "ReactBootstrap",
+    // "react-bootstrap": "ReactBootstrap",
     ethers: "ethers",
     lodash: "_",
   },

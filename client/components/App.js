@@ -2,11 +2,10 @@
 const { BrowserRouter, Route, Switch } = ReactRouterDOM;
 
 // eslint-disable-next-line no-undef
-const { Modal, Button } = ReactBootstrap;
+import { Modal, Button } from "react-bootstrap";
 
 const ethers = require("ethers");
 import ls from "local-storage";
-import { Contract } from "@ethersproject/contracts";
 import config from "../config";
 import clientApi from "../utils/ClientApi";
 import Common from "./Common";
@@ -41,7 +40,7 @@ export default class App extends Common {
       "handleClose",
       "handleShow",
       "setStore",
-      "getContract",
+      "getContracts",
       "updateDimensions",
       "showModal",
       "setWallet",
@@ -89,15 +88,15 @@ export default class App extends Common {
       const chainId = (await provider.getNetwork()).chainId;
       const connectedWallet = await signer.getAddress();
 
-      const { contract, connectedNetwork, networkNotSupported } =
-        this.getContract(config, chainId, provider);
+      const { contracts, connectedNetwork, networkNotSupported } =
+        this.getContracts(config, chainId, provider);
 
       this.setStore({
         provider,
         signer,
         connectedWallet,
         chainId,
-        contract,
+        contracts,
         connectedNetwork,
         networkNotSupported,
       });
@@ -109,7 +108,7 @@ export default class App extends Common {
       );
       clientApi.setConnectedWallet(connectedWallet, chainId);
     } catch (e) {
-      // console.log(e)
+      // console.log(e);
       window.location.reload();
     }
   }
@@ -145,27 +144,25 @@ export default class App extends Common {
     });
   }
 
-  getContract(config, chainId, web3Provider) {
-    let contract;
+  getContracts(config, chainId, web3Provider) {
+    let contracts = {};
     let networkNotSupported = false;
     let connectedNetwork = null;
-
-    if (config.address[chainId]) {
-      contract = new Contract(
-        config.address[chainId],
-        config.abi,
-        web3Provider
-      );
-      for (let name in config.supported) {
-        if (config.supported[name] === chainId) {
-          connectedNetwork = name;
-        }
+    let addresses = config.contracts[chainId];
+    if (addresses) {
+      connectedNetwork = config.supportedId[chainId].chainName;
+      for (let contractName in addresses) {
+        contracts[contractName] = new ethers.Contract(
+          addresses[contractName],
+          config.abi[contractName],
+          web3Provider
+        );
       }
     } else {
       networkNotSupported = true;
     }
     return {
-      contract,
+      contracts,
       connectedNetwork,
       networkNotSupported,
     };

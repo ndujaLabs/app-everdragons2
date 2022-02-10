@@ -2,7 +2,7 @@
 const { Redirect } = ReactRouterDOM;
 
 // eslint-disable-next-line no-undef
-const { Container, Button, Row, Col } = ReactBootstrap;
+import { Container, Button, Row, Col } from "react-bootstrap";
 
 import Base from "./Base";
 import Loading from "./Loading";

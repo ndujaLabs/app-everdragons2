@@ -3,7 +3,7 @@ import Base from "./Base";
 import Ab from "./Ab";
 
 // eslint-disable-next-line no-undef
-const { Navbar } = ReactBootstrap;
+import { Navbar } from "react-bootstrap";
 
 export default class Footer extends Base {
   render() {

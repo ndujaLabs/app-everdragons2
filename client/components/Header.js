@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-undef
-const { Navbar, Nav, Button } = ReactBootstrap;
+import { Navbar, Nav, Button } from "react-bootstrap";
 
 // eslint-disable-next-line no-undef
 const { Link } = ReactRouterDOM;
@@ -64,7 +64,7 @@ export default class Header extends Base {
       let fullAddress = this.Store.connectedWallet;
       shortAddress = this.ellipseAddress(fullAddress);
       address = (
-        <span onClick={this.copyToClipboard} className={"pointer"}>
+        <span onClick={this.copyToClipboard} style={{ cursor: "copy" }}>
           {shortAddress}
           {/*{isPhone ? null : (*/}
           {/*  <i*/}
@@ -77,22 +77,27 @@ export default class Header extends Base {
       );
     }
 
-    // let connectedTo = (
+    let connectedTo = null;
+    //   (
     //   <span className={"connected"}>
     //     {this.Store.connectedWallet ? (
-    //       <span className={"notConnected"}>Switch to Ethereum Mainnet</span>
+    //       <span className={"notConnected"}>Switch to Polygon</span>
     //     ) : null}
     //   </span>
     // );
-    // let { connectedNetwork } = this.Store;
 
-    // if (connectedNetwork) {
-    //   connectedTo = "";
-    //   // <span><i className="fa fa-plug"
-    //   //          style={{color: '#40cc90', marginRight: 10}}/></span>
-    // } else {
-    //   // connectedTo = '
-    // }
+    let { connectedNetwork } = this.Store;
+    if (connectedNetwork) {
+      connectedTo = (
+        <span>
+          <i
+            className="fa fa-plug"
+            style={{ color: "#40cc90", marginRight: 10 }}
+          />{" "}
+          Connected to {connectedNetwork}
+        </span>
+      );
+    }
 
     // const getTitle = (what, title) => {
     //   let { which } = this.state;
@@ -114,7 +119,7 @@ export default class Header extends Base {
         expand="lg"
         className={"roboto"}
       >
-        <Navbar.Brand href="/">
+        <Navbar.Brand href="https://everdragons2.com">
           <img src={"/images/everDragons2Icon.png"} style={{ height: 40 }} />
         </Navbar.Brand>
         <Navbar.Toggle
@@ -146,42 +151,13 @@ export default class Header extends Base {
             </Nav>
           )}
         </Navbar.Collapse>
-
         <Navbar.Collapse className="justify-content-end">
-          {/*<Navbar.Text className={"socialLinks2"}>*/}
-          {/*  <a*/}
-          {/*    className="item"*/}
-          {/*    target="_blank"*/}
-          {/*    href="https://twitter.com/everdragons2"*/}
-          {/*    rel="noreferrer"*/}
-          {/*  >*/}
-          {/*    <i className="fab fa-twitter" />{" "}*/}
-          {/*    <span className="roboto300">Twitter</span>*/}
-          {/*  </a>*/}
-          {/*  <a*/}
-          {/*    className="item"*/}
-          {/*    href={"https://discord.gg/AzfFnUjrnG"}*/}
-          {/*    rel="noreferrer"*/}
-          {/*  >*/}
-          {/*    <i className="fab fa-discord" />{" "}*/}
-          {/*    <span className="roboto300">Discord</span>*/}
-          {/*  </a>*/}
-          {/*  <a*/}
-          {/*    className="item"*/}
-          {/*    href={"https://medium.com/ndujalabs"}*/}
-          {/*    rel="noreferrer"*/}
-          {/*  >*/}
-          {/*    <i className="fab fa-medium" />{" "}*/}
-          {/*    <span className="roboto300">Blog</span>*/}
-          {/*  </a>*/}
-          {/*</Navbar.Text>*/}
-
           {this.Store.discordUser ? (
             <Navbar.Text>
               Hi <strong>{this.Store.discordUser.username}</strong>
             </Navbar.Text>
           ) : null}
-          {/*<Navbar.Text>{connectedTo}</Navbar.Text>*/}
+          <Navbar.Text>{connectedTo}</Navbar.Text>
           {this.Store.connectedWallet ? (
             <Navbar.Text>
               <i
@@ -199,13 +175,6 @@ export default class Header extends Base {
               Connect your wallet
             </Button>
           )}
-          {/*{Address.isAdmin(this.Store.connectedWallet) ? (*/}
-          {/*  <Navbar.Text>*/}
-          {/*    <Link to="/admin">*/}
-          {/*      <i className="fas fa-tools" /> Admin*/}
-          {/*    </Link>*/}
-          {/*  </Navbar.Text>*/}
-          {/*) : null}*/}
         </Navbar.Collapse>
       </Navbar>
     );

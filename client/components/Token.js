@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-undef
 const { Redirect } = ReactRouterDOM;
 // eslint-disable-next-line no-undef
-const { Container } = ReactBootstrap;
+import { Container } from "react-bootstrap";
 
 import Base from "./Base";
 import queryString from "query-string";

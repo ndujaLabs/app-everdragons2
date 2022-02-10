@@ -1,32 +1,23 @@
-import InputSolution from "./sections/InputSolution";
+import BuyTokens from "./sections/BuyTokens";
 
 // eslint-disable-next-line no-undef
-const { Redirect } = ReactRouterDOM;
+// const { Redirect } = ReactRouterDOM;
 
 import * as Scroll from "react-scroll";
-import queryString from "query-string";
-import { ethers } from "ethers";
-
+// import queryString from "query-string";
+// import { ethers } from "ethers";
+import { switchTo } from "../utils/network";
 // eslint-disable-next-line no-undef
-const { Container, Row, Col } = ReactBootstrap;
+import { Container, Row, Col } from "react-bootstrap";
 
 import Base from "./Base";
+import Ab from "./Ab";
 
 export default class Home extends Base {
   constructor(props) {
     super(props);
-    const qs = queryString.parse(window.location.search);
-    if (
-      qs["agdaroth-sent-me"] &&
-      ethers.utils.id(qs["agdaroth-sent-me"]) ===
-        "0x754806243f179623bd2c9ac7fb8ea63c12e5ddcd29a983176bf1c44c09e987e7"
-    ) {
-      this.state = {
-        nice: true,
-      };
-    } else {
-      this.state = {};
-    }
+
+    this.state = {};
   }
 
   componentDidMount() {
@@ -34,11 +25,11 @@ export default class Home extends Base {
   }
 
   render() {
-    const { discordUser, connectedWallet } = this.Store;
+    const { connectedWallet, connectedNetwork } = this.Store;
 
-    if (!discordUser) {
-      return <Redirect to={"/welcome"} />;
-    }
+    // if (!discordUser) {
+    //   return <Redirect to={"/welcome"} />;
+    // }
 
     return (
       <Container style={{ marginTop: 100 }}>
@@ -54,13 +45,19 @@ export default class Home extends Base {
           </Col>
         </Row>
         {connectedWallet ? (
-          this.state.nice ? (
-            <InputSolution Store={this.Store} setStore={this.setStore} />
+          connectedNetwork ? (
+            <BuyTokens Store={this.Store} setStore={this.setStore} />
           ) : (
             <Row>
               <Col>
                 <h2 className={"centered mt24"}>
-                  It looks like you came here too early :-(
+                  Please, connect your wallet to Polygon PoS.
+                  <br />
+                  <Ab
+                    label={"Click here to switch/configure it"}
+                    onClick={() => switchTo(80001)}
+                  />
+                  .
                 </h2>
               </Col>
             </Row>
@@ -69,9 +66,7 @@ export default class Home extends Base {
           <Row>
             <Col>
               <h2 className={"centered mt24"}>
-                Please, connect your wallet before input the solutions.
-                <br />
-                It is necessary to whitelist you, if the solutions are correct.
+                Connect your wallet to access the Everdragons2 App
               </h2>
             </Col>
           </Row>
