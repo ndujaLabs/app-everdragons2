@@ -926,3 +926,11 @@ input::placeholder {
     font-size: 1.8rem;
     padding: 6px 0 24px;
 }
+
+.trade {
+    font-size: 1rem;
+}
+
+.trade a {
+    color: cadetblue !important;
+}

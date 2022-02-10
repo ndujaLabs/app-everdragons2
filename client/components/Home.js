@@ -35,10 +35,10 @@ export default class Home extends Base {
       <Container style={{ marginTop: 100 }}>
         <Row>
           <Col className={"centered"}>
-              <img
-                src={"/images/new-everdragons2logo.png"}
-                className={"ed2logoSmall"}
-              />
+            <img
+              src={"/images/new-everdragons2logo.png"}
+              className={"ed2logoSmall"}
+            />
           </Col>
         </Row>
         {connectedWallet ? (

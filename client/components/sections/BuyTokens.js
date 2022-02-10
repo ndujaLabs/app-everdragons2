@@ -14,6 +14,7 @@ import Loading from "../Loading";
 import { ethers } from "ethers";
 import { decodeMetamaskError } from "../../utils/networkUtils";
 import Address from "../../utils/Address";
+import Ab from "../Ab";
 
 export default class BuyTokens extends Base {
   constructor(props) {
@@ -216,6 +217,14 @@ export default class BuyTokens extends Base {
                 style={{ padding: 16, backgroundColor: "#cf9" }}
               >
                 Congratulations, you own {balance} E2GT
+                <div className={"trade"}>
+                  <Ab
+                    link={
+                      "https://testnets.opensea.io/collection/everdragons2-genesis-token-ip1kxjwrjn"
+                    }
+                    label={"Trade them on OpenSea"}
+                  />
+                </div>
               </div>
             </Col>
             <Col lg={2}></Col>
@@ -248,7 +257,7 @@ export default class BuyTokens extends Base {
                 disabled={submitting}
                 onClick={this.submit}
                 className={"shortInput"}
-                variant={'success'}
+                variant={"success"}
               >
                 Buy now!
               </Button>
