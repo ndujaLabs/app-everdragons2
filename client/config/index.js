@@ -25,22 +25,34 @@ const config = {
     137: {
       chainId: "0x" + Number(137).toString(16),
       chainName: "Polygon PoS (ex-Matic)",
-      symbol: "MATIC",
+      nativeCurrency: {
+        name: "MATIC",
+        symbol: "MATIC",
+        decimals: 18,
+      },
       rpcUrls: ["https://polygon-rpc.com"],
       blockExplorerUrls: ["https://polygonscan.com"],
     },
     80001: {
       chainId: "0x" + Number(80001).toString(16),
       chainName: "Mumbai Polygon Testnet",
-      symbol: "MATIC",
       rpcUrls: ["https://rpc-mumbai.matic.today"],
       blockExplorerUrls: ["https://mumbai-explorer.matic.today"],
+      nativeCurrency: {
+        name: "MATIC",
+        symbol: "MATIC",
+        decimals: 18,
+      },
     },
     1337: isDev
       ? {
           chainId: "0x" + Number(1337).toString(16),
           chainName: "Localhost 8545",
-          symbol: "ETH",
+          nativeCurrency: {
+            name: "ETH",
+            symbol: "ETH",
+            decimals: 18,
+          },
           rpcUrls: ["http://localhost:8545"],
           blockExplorerUrls: [],
         }
