@@ -2,6 +2,7 @@
 const { BrowserRouter, Route, Switch } = ReactRouterDOM;
 
 import PopUp from "./PopUp";
+import { BrowserView } from "react-device-detect";
 
 const ethers = require("ethers");
 import ls from "local-storage";
@@ -214,13 +215,13 @@ export default class App extends Common {
     const { show } = modals || {};
     return (
       <BrowserRouter>
-        {this.isMobile() ? null : (
+        <BrowserView>
           <Header
             Store={Store}
             setStore={this.setStore}
             connect={this.connect}
           />
-        )}
+        </BrowserView>
         <main>
           <Switch>
             <Route exact path="/">

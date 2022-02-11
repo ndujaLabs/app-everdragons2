@@ -3,6 +3,7 @@ import { Navbar, Nav, Button } from "react-bootstrap";
 
 // eslint-disable-next-line no-undef
 const { Link } = ReactRouterDOM;
+import { BrowserView } from "react-device-detect";
 
 import Base from "./Base";
 
@@ -161,23 +162,25 @@ export default class Header extends Base {
             </Navbar.Text>
           ) : null}
           <Navbar.Text>{connectedTo}</Navbar.Text>
-          {this.isMobile() ? null : this.Store.connectedWallet ? (
-            <Navbar.Text>
-              <i
-                className="fas fa-user-astronaut"
-                style={{ marginRight: 10 }}
-              />
-              {address}
-            </Navbar.Text>
-          ) : (
-            <Button
-              onClick={this.props.connect}
-              variant="primary"
-              className={"chiaro"}
-            >
-              Connect your wallet
-            </Button>
-          )}
+          <BrowserView>
+            {this.Store.connectedWallet ? (
+              <Navbar.Text>
+                <i
+                  className="fas fa-user-astronaut"
+                  style={{ marginRight: 10 }}
+                />
+                {address}
+              </Navbar.Text>
+            ) : (
+              <Button
+                onClick={this.props.connect}
+                variant="primary"
+                className={"chiaro"}
+              >
+                Connect your wallet
+              </Button>
+            )}
+          </BrowserView>
         </Navbar.Collapse>
       </Navbar>
     );

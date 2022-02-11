@@ -3,6 +3,8 @@ import BuyTokens from "./sections/BuyTokens";
 // eslint-disable-next-line no-undef
 // const { Redirect } = ReactRouterDOM;
 
+import { BrowserView, MobileView } from "react-device-detect";
+
 import * as Scroll from "react-scroll";
 // import queryString from "query-string";
 // import { ethers } from "ethers";
@@ -41,7 +43,7 @@ export default class Home extends Base {
             />
           </Col>
         </Row>
-        {this.isMobile() ? (
+        <MobileView>
           <Row>
             <Col>
               <h2 className={"centered mt24"}>
@@ -50,33 +52,36 @@ export default class Home extends Base {
               </h2>
             </Col>
           </Row>
-        ) : connectedWallet ? (
-          connectedNetwork ? (
-            <BuyTokens Store={this.Store} setStore={this.setStore} />
+        </MobileView>
+        <BrowserView>
+          {connectedWallet ? (
+            connectedNetwork ? (
+              <BuyTokens Store={this.Store} setStore={this.setStore} />
+            ) : (
+              <Row>
+                <Col>
+                  <h2 className={"centered mt24"}>
+                    Please, connect your wallet to Polygon PoS.
+                    <br />
+                    <Ab
+                      label={"Click here to switch/configure it"}
+                      onClick={() => switchTo(137)}
+                    />
+                    .
+                  </h2>
+                </Col>
+              </Row>
+            )
           ) : (
             <Row>
               <Col>
                 <h2 className={"centered mt24"}>
-                  Please, connect your wallet to Polygon PoS.
-                  <br />
-                  <Ab
-                    label={"Click here to switch/configure it"}
-                    onClick={() => switchTo(137)}
-                  />
-                  .
+                  Connect your wallet to access the Everdragons2 App
                 </h2>
               </Col>
             </Row>
-          )
-        ) : (
-          <Row>
-            <Col>
-              <h2 className={"centered mt24"}>
-                Connect your wallet to access the Everdragons2 App
-              </h2>
-            </Col>
-          </Row>
-        )}
+          )}
+        </BrowserView>
       </Container>
     );
   }
