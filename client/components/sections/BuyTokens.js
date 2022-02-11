@@ -300,7 +300,7 @@ export default class BuyTokens extends Base {
           <Col lg={2} />
           <Col lg={8}>
             <div className={"mt24 likeh2"}>
-              Get Everdragons2 Genesis Tokens
+              Get Everdragons2 Genesis Tokens eggs
               <div className={"smallUnder"}>
                 <Ab
                   label={"Add the token to your wallet"}
@@ -332,7 +332,10 @@ export default class BuyTokens extends Base {
               {price ? (
                 <div className={"underProgress centered"}>
                   {minted < 250 ? (
-                    <span>Tokens available for sale: {250 - minted}. Price 500 MATIC.</span>
+                    <span>
+                      Tokens available for sale: {250 - minted}. Price 500
+                      MATIC.
+                    </span>
                   ) : (
                     "Sold out."
                   )}
