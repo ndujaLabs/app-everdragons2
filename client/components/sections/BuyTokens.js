@@ -10,7 +10,7 @@ import Address from "../../utils/Address";
 import Ab from "../Ab";
 import { openSeaLink, contracts } from "../../config";
 import { switchTo } from "../../utils/networkUtils";
-import {expect} from 'chai';
+import { expect } from "chai";
 
 export default class BuyTokens extends Base {
   constructor(props) {
@@ -332,7 +332,7 @@ export default class BuyTokens extends Base {
               {price ? (
                 <div className={"underProgress centered"}>
                   {minted < 250 ? (
-                    <span>Tokens available for sale: {250 - minted}</span>
+                    <span>Tokens available for sale: {250 - minted}. Price 500 MATIC.</span>
                   ) : (
                     "Sold out."
                   )}
