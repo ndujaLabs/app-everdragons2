@@ -1,12 +1,5 @@
 // eslint-disable-next-line no-undef
-import {
-  Row,
-  Col,
-  Button,
-  InputGroup,
-  FormControl,
-  ProgressBar,
-} from "react-bootstrap";
+import { Row, Col, Button, ProgressBar, Spinner } from "react-bootstrap";
 
 import FormGroup from "../FormGroup";
 import Base from "../Base";
@@ -15,6 +8,8 @@ import { ethers } from "ethers";
 import { decodeMetamaskError } from "../../utils/networkUtils";
 import Address from "../../utils/Address";
 import Ab from "../Ab";
+import { openSeaLink } from "../../config";
+import { switchTo } from "../../utils/networkUtils";
 
 export default class BuyTokens extends Base {
   constructor(props) {
@@ -28,6 +23,11 @@ export default class BuyTokens extends Base {
       minted: 0,
       balance: 0,
       address: "",
+      saleStarted: false,
+      saleStartIn: 0,
+      progress: 0,
+      isOwner: false,
+      checked: false,
     };
 
     this.bindMany([
@@ -36,6 +36,7 @@ export default class BuyTokens extends Base {
       "submit",
       "getValues",
       "submit2",
+      "checkAmount",
     ]);
   }
 
@@ -43,8 +44,7 @@ export default class BuyTokens extends Base {
     this.getValues();
   }
 
-  handleChange(event) {
-    let { name, value } = event.target;
+  checkAmount(name, value) {
     const state = {
       errors: {},
       total: 0,
@@ -67,34 +67,59 @@ export default class BuyTokens extends Base {
     this.setState(state);
   }
 
+  handleChange(event) {
+    let { name, value } = event.target;
+    this.checkAmount(name, value);
+  }
+
   handleBlur(event) {
-    // let { name, value } = event.target;
-    // const state = {};
-    // state[name] = value;
-    // this.setState(state);
+    let { name, value } = event.target;
+    this.checkAmount(name, value);
   }
 
   async getValues() {
     const { GenesisFarm, Everdragons2Genesis } = this.Store.contracts;
-    const price =
-      this.state.price || ethers.utils.formatEther(await GenesisFarm.price());
-    const nextTokenId = (await GenesisFarm.nextTokenId()).toNumber();
-    const minted = nextTokenId - 351;
-    const progress = Math.ceil((minted * 100) / 600);
-    const balance = (
-      await Everdragons2Genesis.balanceOf(this.Store.connectedWallet)
-    ).toNumber();
-    const isOwner = Address.equal(
-      await Everdragons2Genesis.owner(),
-      this.Store.connectedWallet
-    );
-    this.setState({
-      price,
-      minted,
-      progress,
-      balance,
-      isOwner,
-    });
+    if (GenesisFarm.address !== ethers.constants.AddressZero) {
+      const price =
+        this.state.price || ethers.utils.formatEther(await GenesisFarm.price());
+      const saleStartAt = (await GenesisFarm.saleStartAt()).toNumber() * 1000;
+      let saleStarted = false;
+      let saleStartIn = 0;
+      if (Date.now() > saleStartAt) {
+        saleStarted = true;
+      } else {
+        saleStartIn = saleStartAt - Date.now();
+      }
+      const nextTokenId = saleStarted
+        ? (await GenesisFarm.nextTokenId()).toNumber()
+        : 351;
+      const minted = nextTokenId - 351;
+      const progress = Math.ceil((minted * 100) / 600);
+      const balance = saleStarted
+        ? (
+            await Everdragons2Genesis.balanceOf(this.Store.connectedWallet)
+          ).toNumber()
+        : 0;
+      const isOwner = Address.equal(
+        await Everdragons2Genesis.owner(),
+        this.Store.connectedWallet
+      );
+      this.setState({
+        saleStarted,
+        saleStartIn,
+        price,
+        minted,
+        progress,
+        balance,
+        isOwner,
+        checked: true,
+      });
+    } else {
+      this.setState({
+        checked: true,
+      });
+    }
+    this.setTimeout(this.getValues, 30000);
   }
 
   async submit() {
@@ -160,16 +185,81 @@ export default class BuyTokens extends Base {
       submitting,
       total,
       price,
-      isOwner,
+      // isOwner,
       progress,
+      saleStarted,
+      saleStartIn,
       error,
       minted,
       balance,
+      checked,
     } = this.state;
+
+    const { chainId } = this.Store;
+
+    if (!checked) {
+      return (
+        <Row>
+          <Col className={"centered"}>
+            <Spinner animation="grow" variant="warning" />
+          </Col>
+        </Row>
+      );
+    }
+
+    if (!saleStarted && !saleStartIn) {
+      return (
+        <Row>
+          <Col>
+            <h2 className={"centered mt24"}>
+              The sale will start Friday, February 11th, at 10 am PST
+            </h2>
+          </Col>
+        </Row>
+      );
+    }
+    let hours, minutes;
+    if (saleStartIn > 0) {
+      hours = parseInt(saleStartIn / 3600000);
+      minutes = parseInt((saleStartIn / 60000) % 60);
+    }
+
     return (
       <div>
+        {chainId === 80001 ? (
+          <Row>
+            <Col lg={2} />
+            <Col lg={8}>
+
+              <div className={"alert centered"}>
+                YOU ARE USING THE TEST APP ON MUMBAI.
+                <br />
+                <Ab
+                  label={"Click here to switch to Polygon PoS"}
+                  onClick={() => switchTo(137)}
+                />
+              </div>
+            </Col>
+            <Col lg={2} />
+          </Row>
+        ) : null}
+        {saleStartIn > 0 ? (
+          <Row>
+            <Col lg={2} />
+            <Col lg={8}>
+              <div
+                className={"textBlock centered"}
+                style={{ padding: 16, backgroundColor: "#cf9" }}
+              >
+                Sale starts in {hours > 0 ? `${hours} hours and ` : ""}
+                {minutes} minutes
+              </div>
+            </Col>
+            <Col lg={2} />
+          </Row>
+        ) : null}
         <Row>
-          <Col lg={2}></Col>
+          <Col lg={2} />
           <Col lg={8}>
             <h2 className={"mt24"}>Get Everdragons2 Genesis Tokens</h2>
             <div className={"padded"}>
@@ -188,13 +278,16 @@ export default class BuyTokens extends Base {
                   style={{
                     textShadow: "0 0 3px white",
                     backgroundImage: "linear-gradient(orange, gold)",
+                    color: "black",
+                    fontWeight: "bold",
                   }}
+                  label={`${minted} sold`}
                 />
               </ProgressBar>
               {price ? (
                 <div className={"underProgress centered"}>
                   {minted < 250 ? (
-                    <span>{250 - minted} available tokens</span>
+                    <span>Tokens available for sale: {250 - minted}</span>
                   ) : (
                     "Sold out."
                   )}
@@ -202,42 +295,42 @@ export default class BuyTokens extends Base {
               ) : null}
             </div>
           </Col>
-          <Col lg={2}></Col>
+          <Col lg={2} />
         </Row>
         {!price ? (
           <Row>
-            <Col lg={2}></Col>
+            <Col lg={2} />
             <Col lg={8}>
               <div className={"centered padded"}>
                 <Loading />
               </div>
             </Col>
-            <Col lg={2}></Col>
+            <Col lg={2} />
           </Row>
         ) : balance ? (
           <Row>
-            <Col lg={2}></Col>
+            <Col lg={2} />
             <Col lg={8}>
               <div
                 className={"textBlock centered"}
                 style={{ padding: 16, backgroundColor: "#cf9" }}
               >
                 Congratulations, you own {balance} E2GT
-                <div className={"trade"}>
-                  <Ab
-                    link={
-                      "https://testnets.opensea.io/collection/everdragons2-genesis-token-ip1kxjwrjn"
-                    }
-                    label={"Trade them on OpenSea"}
-                  />
-                </div>
+                {openSeaLink[chainId] ? (
+                  <div className={"trade"}>
+                    <Ab
+                      link={openSeaLink[chainId]}
+                      label={"You can check them on OpenSea"}
+                    />
+                  </div>
+                ) : null}
               </div>
             </Col>
-            <Col lg={2}></Col>
+            <Col lg={2} />
           </Row>
         ) : null}
 
-        {minted < 250 ? (
+        {saleStartIn > 0 ? null : minted < 250 ? (
           <Row>
             <Col style={{ textAlign: "right" }}>
               <FormGroup

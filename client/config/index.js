@@ -13,12 +13,12 @@ const contracts = Object.assign(
 const config = {
   constants: {
     "Localhost 8545": isDev ? 1337 : undefined,
-    // MUMBAI: 80001,
+    MUMBAI: 80001,
     MATIC: 137,
   },
   supported: {
     "Localhost 8545": isDev ? 1337 : undefined,
-    // "Mumbai Matic Testnet": 80001,
+    "Mumbai Matic Testnet": 80001,
     "Matic Network": 137,
   },
   supportedId: {
@@ -59,6 +59,11 @@ const config = {
           blockExplorerUrls: [],
         }
       : undefined,
+  },
+  openSeaLink: {
+    80001:
+      "https://testnets.opensea.io/collection/everdragons2-genesis-token-ip1kxjwrjn",
+    137: "",
   },
   contracts,
   abi: require("./ABIs.json").contracts,

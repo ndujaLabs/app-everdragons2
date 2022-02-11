@@ -665,7 +665,7 @@ h2 {
 }
 
 .progress {
-    /*background-color: coral !important;*/
+    background-color: darkgreen !important;
     height: 40px !important;
 }
 
@@ -933,4 +933,13 @@ input::placeholder {
 
 .trade a {
     color: cadetblue !important;
+}
+
+.alert {
+    color: crimson;
+    font-weight: bold;
+    font-size: 1.5rem;
+    border-radius: 12px;
+    border-color: #ffaaaa;
+    background-color: #ffcccc60;
 }

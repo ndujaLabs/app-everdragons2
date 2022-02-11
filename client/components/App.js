@@ -120,7 +120,7 @@ export default class App extends Common {
         window.ethereum.on("chainChanged", () => window.location.reload());
         window.ethereum.on("disconnect", () => window.location.reload());
 
-        this.setWallet();
+        await this.setWallet();
       }
     } else {
       // if (!dontShowError) {
