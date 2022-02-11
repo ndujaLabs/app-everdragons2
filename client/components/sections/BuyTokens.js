@@ -223,7 +223,6 @@ export default class BuyTokens extends Base {
       hours = parseInt(saleStartIn / 3600000);
       minutes = parseInt((saleStartIn / 60000) % 60);
     }
-
     return (
       <div>
         {chainId === 80001 ? (
