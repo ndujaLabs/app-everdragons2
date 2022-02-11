@@ -10,6 +10,7 @@ import Address from "../../utils/Address";
 import Ab from "../Ab";
 import { openSeaLink, contracts } from "../../config";
 import { switchTo } from "../../utils/networkUtils";
+import {expect} from 'chai';
 
 export default class BuyTokens extends Base {
   constructor(props) {

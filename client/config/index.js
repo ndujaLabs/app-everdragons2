@@ -61,7 +61,7 @@ const config = {
   openSeaLink: {
     80001:
       "https://testnets.opensea.io/collection/everdragons2-genesis-token-ip1kxjwrjn",
-    137: "",
+    137: "https://opensea.io/collection/everdragons2-genesis-token",
   },
   contracts,
   abi: require("./ABIs.json").contracts,
