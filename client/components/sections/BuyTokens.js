@@ -310,15 +310,8 @@ export default class BuyTokens extends Base {
             <div className={"padded"}>
               <ProgressBar>
                 <ProgressBar
-                  striped
-                  variant="success"
-                  now={59}
-                  label={"350 tokens reserved"}
-                  key={1}
-                />
-                <ProgressBar
                   variant="warning"
-                  now={progress}
+                  now={59 + progress}
                   key={2}
                   style={{
                     textShadow: "0 0 3px white",
@@ -326,7 +319,13 @@ export default class BuyTokens extends Base {
                     color: "black",
                     fontWeight: "bold",
                   }}
-                  label={`${minted} sold`}
+                  label={`350 assigned, ${minted} sold`}
+                />
+                <ProgressBar
+                  striped
+                  variant="success"
+                  now={100 - 59 - progress}
+                  key={1}
                 />
               </ProgressBar>
               {price ? (
