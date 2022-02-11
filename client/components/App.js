@@ -149,7 +149,7 @@ export default class App extends Common {
     let networkNotSupported = false;
     let connectedNetwork = null;
     let addresses = config.contracts[chainId];
-    if (addresses) {
+    if (addresses && config.supportedId[chainId]) {
       connectedNetwork = config.supportedId[chainId].chainName;
       for (let contractName in addresses) {
         contracts[contractName] = new ethers.Contract(

@@ -33,8 +33,7 @@ const config = {
       rpcUrls: ["https://polygon-rpc.com"],
       blockExplorerUrls: ["https://polygonscan.com"],
     },
-    80001: isDev
-      ? {
+    80001: {
           chainId: "0x" + Number(80001).toString(16),
           chainName: "Mumbai Polygon Testnet",
           rpcUrls: ["https://rpc-mumbai.matic.today"],
@@ -44,8 +43,7 @@ const config = {
             symbol: "MATIC",
             decimals: 18,
           },
-        }
-      : undefined,
+        },
     1337: isDev
       ? {
           chainId: "0x" + Number(1337).toString(16),
