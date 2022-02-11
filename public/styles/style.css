@@ -595,9 +595,14 @@ span.button {
 }
 
 .home-section h1,
-h2 {
+h2,
+.likeh2 {
     text-align: center;
     font-family: "Hina Mincho", serif !important;
+}
+
+.likeh2 {
+    font-size: 2.2rem;
 }
 
 .home-section h1 {
@@ -923,7 +928,7 @@ input::placeholder {
 }
 
 .underProgress {
-    font-size: 1.8rem;
+    font-size: 1.4rem;
     padding: 6px 0 24px;
 }
 
@@ -942,4 +947,13 @@ input::placeholder {
     border-radius: 12px;
     border-color: #ffaaaa;
     background-color: #ffcccc60;
+}
+
+.smallUnder {
+    font-size: 1rem;
+    font-family: "Roboto", sans-serif;
+}
+
+.code {
+    font-family: "Ubuntu Mono", monospace;
 }

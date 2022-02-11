@@ -41,7 +41,16 @@ export default class Home extends Base {
             />
           </Col>
         </Row>
-        {connectedWallet ? (
+        {this.isMobile() ? (
+          <Row>
+            <Col>
+              <h2 className={"centered mt24"}>
+                Please, use a desktop computer to mint your Everdragons2 Genesis
+                Token. Mobile is not supported, yet.
+              </h2>
+            </Col>
+          </Row>
+        ) : connectedWallet ? (
           connectedNetwork ? (
             <BuyTokens Store={this.Store} setStore={this.setStore} />
           ) : (

@@ -25,6 +25,10 @@ class Base extends Common {
     }
   }
 
+  isMobile() {
+    return window.innerWidth < 990;
+  }
+
   setTimeout(func, time) {
     this.timerId = setTimeout(() => this.endTimeout(func), time);
   }

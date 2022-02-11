@@ -1,8 +1,7 @@
 // eslint-disable-next-line no-undef
 const { BrowserRouter, Route, Switch } = ReactRouterDOM;
 
-// eslint-disable-next-line no-undef
-import { Modal, Button } from "react-bootstrap";
+import PopUp from "./PopUp";
 
 const ethers = require("ethers");
 import ls from "local-storage";
@@ -21,6 +20,24 @@ export default class App extends Common {
     super(props);
     let localStore = JSON.parse(ls("localStore") || "{}");
 
+    let globalFuncs = ["showPopUp"];
+
+    this.bindMany(
+      globalFuncs.concat([
+        "handleClose",
+        "setStore",
+        "getContracts",
+        "updateDimensions",
+        "setWallet",
+        "connect",
+      ])
+    );
+
+    const globals = {};
+    for (let f of globalFuncs) {
+      globals[f] = this[f];
+    }
+
     this.state = {
       Store: Object.assign(
         {
@@ -31,21 +48,22 @@ export default class App extends Common {
           config,
           width: this.getWidth(),
           pathname: window.location.pathname,
+          globals,
         },
         localStore
       ),
     };
+  }
 
-    this.bindMany([
-      "handleClose",
-      "handleShow",
-      "setStore",
-      "getContracts",
-      "updateDimensions",
-      "showModal",
-      "setWallet",
-      "connect",
-    ]);
+  handleClose(event) {
+    this.setState({
+      modals: {},
+    });
+    delete this.changes;
+  }
+
+  onChanges(value) {
+    this.changes = value;
   }
 
   getWidth() {
@@ -64,14 +82,6 @@ export default class App extends Common {
 
   componentWillUnmount() {
     window.removeEventListener("resize", this.updateDimensions.bind(this));
-  }
-
-  handleClose() {
-    this.setState({ show: false });
-  }
-
-  handleShow() {
-    this.setState({ show: true });
   }
 
   async componentDidMount() {
@@ -133,14 +143,14 @@ export default class App extends Common {
     }
   }
 
-  showModal(modalTitle, modalBody, modalClose, secondButton, modalAction) {
-    this.setStore({
-      modalTitle,
-      modalBody,
-      modalClose,
-      secondButton,
-      modalAction,
-      showModal: true,
+  showPopUp(params) {
+    this.setState({
+      modals: Object.assign(params, {
+        show: true,
+        handleClose: this.handleClose,
+        noSave: true,
+        closeLabel: "Ok",
+      }),
     });
   }
 
@@ -195,12 +205,22 @@ export default class App extends Common {
     }
   }
 
-  render() {
-    const Store = this.state.Store;
+  isMobile() {
+    return window.innerWidth < 990;
+  }
 
+  render() {
+    const { modals, Store } = this.state;
+    const { show } = modals || {};
     return (
       <BrowserRouter>
-        <Header Store={Store} setStore={this.setStore} connect={this.connect} />
+        {this.isMobile() ? null : (
+          <Header
+            Store={Store}
+            setStore={this.setStore}
+            connect={this.connect}
+          />
+        )}
         <main>
           <Switch>
             <Route exact path="/">
@@ -218,36 +238,7 @@ export default class App extends Common {
           </Switch>
           <Footer />
         </main>
-        {Store.showModal ? (
-          <Modal.Dialog>
-            <Modal.Header>
-              <Modal.Title>{Store.modalTitle}</Modal.Title>
-            </Modal.Header>
-
-            <Modal.Body>{Store.modalBody}</Modal.Body>
-
-            <Modal.Footer>
-              <Button
-                onClick={() => {
-                  this.setStore({ showModal: false });
-                }}
-              >
-                {Store.modalClose || "Close"}
-              </Button>
-              {this.state.secondButton ? (
-                <Button
-                  onClick={() => {
-                    Store.modalAction();
-                    this.setStore({ showModal: false });
-                  }}
-                  bsStyle="primary"
-                >
-                  {Store.secondButton}
-                </Button>
-              ) : null}
-            </Modal.Footer>
-          </Modal.Dialog>
-        ) : null}
+        {show ? <PopUp modals={modals} /> : null}
       </BrowserRouter>
     );
   }

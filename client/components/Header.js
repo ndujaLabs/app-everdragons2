@@ -161,7 +161,7 @@ export default class Header extends Base {
             </Navbar.Text>
           ) : null}
           <Navbar.Text>{connectedTo}</Navbar.Text>
-          {this.Store.connectedWallet ? (
+          {this.isMobile() ? null : this.Store.connectedWallet ? (
             <Navbar.Text>
               <i
                 className="fas fa-user-astronaut"

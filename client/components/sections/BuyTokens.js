@@ -8,7 +8,7 @@ import { ethers } from "ethers";
 import { decodeMetamaskError } from "../../utils/networkUtils";
 import Address from "../../utils/Address";
 import Ab from "../Ab";
-import { openSeaLink } from "../../config";
+import { openSeaLink, contracts } from "../../config";
 import { switchTo } from "../../utils/networkUtils";
 
 export default class BuyTokens extends Base {
@@ -37,6 +37,8 @@ export default class BuyTokens extends Base {
       "getValues",
       "submit2",
       "checkAmount",
+      "copyToClipboard",
+      "showHowToAdd",
     ]);
   }
 
@@ -65,6 +67,43 @@ export default class BuyTokens extends Base {
     }
     state[name] = value;
     this.setState(state);
+  }
+
+  showHowToAdd() {
+    const { chainId, globals } = this.Store;
+    const address = contracts[chainId].Everdragons2Genesis;
+    globals.showPopUp({
+      title: "How to add E2GT to your wallet",
+      body: (
+        <ul>
+          <li>Open Metamask</li>
+          <li>Scroll down the assets</li>
+          <li>
+            Click on <i>Import tokens</i> and set
+            <ul>
+              <li>
+                Address: <b className={"code"}>{address}</b>
+              </li>
+              <li>
+                Symbol: <b className={"code"}>E2GT</b>
+              </li>
+              <li>
+                Decimals: <b className={"code"}>0</b>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      ),
+    });
+  }
+  copyToClipboard(chainId) {
+    const address = contracts[chainId].Everdragons2Genesis;
+    try {
+      navigator.clipboard.writeText(address);
+      this.setState({
+        copied: true,
+      });
+    } catch (e) {}
   }
 
   handleChange(event) {
@@ -234,7 +273,7 @@ export default class BuyTokens extends Base {
                 <br />
                 <Ab
                   label={"Click here to switch to Polygon PoS"}
-                  onClick={() => switchTo(137)}
+                  onClick={() => switchTo(chainId)}
                 />
               </div>
             </Col>
@@ -259,7 +298,15 @@ export default class BuyTokens extends Base {
         <Row>
           <Col lg={2} />
           <Col lg={8}>
-            <h2 className={"mt24"}>Get Everdragons2 Genesis Tokens</h2>
+            <div className={"mt24 likeh2"}>
+              Get Everdragons2 Genesis Tokens
+              <div className={"smallUnder"}>
+                <Ab
+                  label={"Add the token to your wallet"}
+                  onClick={this.showHowToAdd}
+                />
+              </div>
+            </div>
             <div className={"padded"}>
               <ProgressBar>
                 <ProgressBar
