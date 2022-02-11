@@ -273,7 +273,7 @@ export default class BuyTokens extends Base {
                 <br />
                 <Ab
                   label={"Click here to switch to Polygon PoS"}
-                  onClick={() => switchTo(chainId)}
+                  onClick={() => switchTo(137)}
                 />
               </div>
             </Col>
