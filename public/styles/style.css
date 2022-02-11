@@ -957,3 +957,15 @@ input::placeholder {
 .code {
     font-family: "Ubuntu Mono", monospace;
 }
+
+.balance {
+    clear: both;
+    color: darkgreen;
+    padding-left: 37px;
+    padding-top: 8px;
+}
+
+.input-error {
+    color: crimson;
+    font-weight: bold;
+}

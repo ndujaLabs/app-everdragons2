@@ -29,6 +29,7 @@ export default class BuyTokens extends Base {
       progress: 0,
       isOwner: false,
       checked: false,
+      maticBalance: 0
     };
 
     this.bindMany([
@@ -60,6 +61,8 @@ export default class BuyTokens extends Base {
         state.errors.amount = "Not a number";
       } else if (value > 10) {
         state.errors.amount = "You cannot buy more than 10 tokens at once";
+      } else if (parseFloat(this.state.maticBalance) < value * parseFloat(this.state.price)) {
+        state.errors.amount = "Insufficient funds";
       } else {
         state.total = parseFloat(
           (parseFloat(this.state.price) * value).toString().substring(0, 5)
@@ -120,6 +123,15 @@ export default class BuyTokens extends Base {
   async getValues() {
     const { GenesisFarm, Everdragons2Genesis } = this.Store.contracts;
     if (GenesisFarm.address !== ethers.constants.AddressZero) {
+      let maticBalance = await this.Store.provider.getBalance(
+        this.Store.connectedWallet
+      );
+      let tmp = ethers.utils.formatEther(maticBalance.toString()).split(".");
+      if (tmp[1]) {
+        tmp[1] = tmp[1].substring(0, 2);
+      }
+      maticBalance = tmp[1] ? tmp.join(".") : tmp[0];
+
       const price =
         this.state.price || ethers.utils.formatEther(await GenesisFarm.price());
       const saleStartAt = (await GenesisFarm.saleStartAt()).toNumber() * 1000;
@@ -153,6 +165,7 @@ export default class BuyTokens extends Base {
         balance,
         isOwner,
         checked: true,
+        maticBalance
       });
     } else {
       this.setState({
@@ -233,6 +246,7 @@ export default class BuyTokens extends Base {
       minted,
       balance,
       checked,
+      maticBalance
     } = this.state;
 
     const { chainId } = this.Store;
@@ -400,15 +414,20 @@ export default class BuyTokens extends Base {
                   </div>
                 </div>
               ) : (
-                <Button
-                  size={"lg"}
-                  disabled={submitting}
-                  onClick={this.submit}
-                  className={"shortInput"}
-                  variant={"success"}
-                >
-                  Buy now!
-                </Button>
+                <div>
+                  <Button
+                    size={"lg"}
+                    disabled={submitting}
+                    onClick={this.submit}
+                    className={"shortInput"}
+                    variant={"success"}
+                  >
+                    Buy now!
+                  </Button>
+                  <div className={'balance'}>
+                    Your MATIC balance: <b>{maticBalance}</b>
+                  </div>
+                </div>
               )}
             </Col>
           </Row>
@@ -448,6 +467,7 @@ export default class BuyTokens extends Base {
         {/*    </Col>*/}
         {/*  </Row>*/}
         {/*) : null}*/}
+        <Row><Col><div style={{height: 100}}/></Col></Row>
       </div>
     );
   }
