@@ -230,7 +230,6 @@ export default class BuyTokens extends Base {
           <Row>
             <Col lg={2} />
             <Col lg={8}>
-
               <div className={"alert centered"}>
                 YOU ARE USING THE TEST APP ON MUMBAI.
                 <br />

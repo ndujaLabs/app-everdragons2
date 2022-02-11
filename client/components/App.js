@@ -108,8 +108,8 @@ export default class App extends Common {
       );
       clientApi.setConnectedWallet(connectedWallet, chainId);
     } catch (e) {
-      // console.log(e);
-      window.location.reload();
+      console.error(e);
+      // window.location.reload();
     }
   }
 
