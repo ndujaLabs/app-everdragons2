@@ -350,8 +350,9 @@ export default class BuyTokens extends Base {
                 <div className={"underProgress centered"}>
                   {minted < 250 ? (
                     <span>
-                      Total supply: <b>600</b> | Left for sale: <b>{250 - minted}</b> | Price: <b>500</b>
-                      MATIC.
+                      Total supply: <b>600</b> | Left for sale:{" "}
+                      <b>{250 - minted}</b> | Price: <b>500</b>
+                      <span style={{ fontSize: "80%" }}> MATIC</span>
                     </span>
                   ) : (
                     "Sold out."
