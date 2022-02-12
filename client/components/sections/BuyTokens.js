@@ -41,6 +41,7 @@ export default class BuyTokens extends Base {
       "checkAmount",
       "copyToClipboard",
       "showHowToAdd",
+      "getFarm"
     ]);
   }
 
@@ -124,8 +125,9 @@ export default class BuyTokens extends Base {
   }
 
   async getValues() {
-    const { GenesisFarm, Everdragons2Genesis } = this.Store.contracts;
-    if (GenesisFarm.address !== ethers.constants.AddressZero) {
+    const { Everdragons2Genesis } = this.Store.contracts;
+    const farm = this.getFarm()
+    if (farm.address !== ethers.constants.AddressZero) {
       let maticBalance = await this.Store.provider.getBalance(
         this.Store.connectedWallet
       );
@@ -134,34 +136,19 @@ export default class BuyTokens extends Base {
         tmp[1] = tmp[1].substring(0, 2);
       }
       maticBalance = tmp[1] ? tmp.join(".") : tmp[0];
-
       const price =
-        this.state.price || ethers.utils.formatEther(await GenesisFarm.price());
-      const saleStartAt = (await GenesisFarm.saleStartAt()).toNumber() * 1000;
-      let saleStarted = false;
-      let saleStartIn = 0;
-      if (Date.now() > saleStartAt) {
-        saleStarted = true;
-      } else {
-        saleStartIn = saleStartAt - Date.now();
-      }
-      const nextTokenId = saleStarted
-        ? (await GenesisFarm.nextTokenId()).toNumber()
-        : 351;
+        this.state.price || ethers.utils.formatEther(await farm.price());
+      const nextTokenId = (await farm.nextTokenId()).toNumber()
       const minted = nextTokenId - 351;
       const progress = Math.ceil((minted * 100) / 600);
-      const balance = saleStarted
-        ? (
+      const balance = (
             await Everdragons2Genesis.balanceOf(this.Store.connectedWallet)
           ).toNumber()
-        : 0;
       const isOwner = Address.equal(
         await Everdragons2Genesis.owner(),
         this.Store.connectedWallet
       );
       this.setState({
-        saleStarted,
-        saleStartIn,
         price,
         minted,
         progress,
@@ -185,12 +172,12 @@ export default class BuyTokens extends Base {
         submitting: "Waiting for response",
         error: undefined,
       });
-      const { GenesisFarm } = this.Store.contracts;
+      const farm = this.getFarm()
       try {
-        let tx = await GenesisFarm.connect(this.Store.signer).buyTokens(
+        let tx = await farm.connect(this.Store.signer).buyTokens(
           amount,
           {
-            value: (await GenesisFarm.price()).mul(amount),
+            value: (await farm.price()).mul(amount),
           }
         );
         await tx.wait();
@@ -212,13 +199,17 @@ export default class BuyTokens extends Base {
     }
   }
 
+  getFarm() {
+    return (this.Store.chainId === 137 ? this.Store.contracts.GenesisFarm : this.Store.contracts.GenesisFarm2)
+  }
+
   async submit2() {
     const amount = this.state.amount2;
     const address = this.state.address;
 
-    const { GenesisFarm } = this.Store.contracts;
+    const farm = this.getFarm()
     try {
-      let tx = await GenesisFarm.connect(this.Store.signer).withdrawProceeds(
+      let tx = await farm.connect(this.Store.signer).withdrawProceeds(
         address,
         amount
       );
@@ -243,8 +234,6 @@ export default class BuyTokens extends Base {
       price,
       // isOwner,
       progress,
-      saleStarted,
-      saleStartIn,
       error,
       minted,
       balance,
@@ -264,22 +253,7 @@ export default class BuyTokens extends Base {
       );
     }
 
-    if (!saleStarted && !saleStartIn) {
-      return (
-        <Row>
-          <Col>
-            <h2 className={"centered mt24"}>
-              The sale will start Friday, February 11th, at 10 am PST
-            </h2>
-          </Col>
-        </Row>
-      );
-    }
     let hours, minutes;
-    if (saleStartIn > 0) {
-      hours = parseInt(saleStartIn / 3600000);
-      minutes = parseInt((saleStartIn / 60000) % 60);
-    }
     return (
       <div>
         {chainId === 80001 ? (
@@ -293,21 +267,6 @@ export default class BuyTokens extends Base {
                   label={"Click here to switch to Polygon PoS"}
                   onClick={() => switchTo(137)}
                 />
-              </div>
-            </Col>
-            <Col lg={2} />
-          </Row>
-        ) : null}
-        {saleStartIn > 0 ? (
-          <Row>
-            <Col lg={2} />
-            <Col lg={8}>
-              <div
-                className={"textBlock centered"}
-                style={{ padding: 16, backgroundColor: "#cf9" }}
-              >
-                Sale starts in {hours > 0 ? `${hours} hours and ` : ""}
-                {minutes} minutes
               </div>
             </Col>
             <Col lg={2} />
@@ -350,8 +309,8 @@ export default class BuyTokens extends Base {
                 <div className={"underProgress centered"}>
                   {minted < 250 ? (
                     <span>
-                      Total supply: <b>600</b> | Left for sale:{" "}
-                      <b>{250 - minted}</b> | Price: <b>500</b>
+                      Total supply: <b>1600</b> | Left for sale:{" "}
+                      <b>{1250 - minted}</b> | Price: <b>100</b>
                       <span style={{ fontSize: "80%" }}> MATIC</span>
                     </span>
                   ) : (
@@ -396,7 +355,7 @@ export default class BuyTokens extends Base {
           </Row>
         ) : null}
 
-        {saleStartIn > 0 ? null : minted < 250 ? (
+        {minted < 250 ? (
           <Row>
             <Col style={{ textAlign: "right" }}>
               <FormGroup
