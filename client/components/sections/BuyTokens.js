@@ -29,7 +29,7 @@ export default class BuyTokens extends Base {
       progress: 0,
       isOwner: false,
       checked: false,
-      maticBalance: 0
+      maticBalance: 0,
     };
 
     this.bindMany([
@@ -61,7 +61,10 @@ export default class BuyTokens extends Base {
         state.errors.amount = "Not a number";
       } else if (value > 10) {
         state.errors.amount = "You cannot buy more than 10 tokens at once";
-      } else if (parseFloat(this.state.maticBalance) < value * parseFloat(this.state.price)) {
+      } else if (
+        parseFloat(this.state.maticBalance) <
+        value * parseFloat(this.state.price)
+      ) {
         state.errors.amount = "Insufficient funds";
       } else {
         state.total = parseFloat(
@@ -165,7 +168,7 @@ export default class BuyTokens extends Base {
         balance,
         isOwner,
         checked: true,
-        maticBalance
+        maticBalance,
       });
     } else {
       this.setState({
@@ -246,7 +249,7 @@ export default class BuyTokens extends Base {
       minted,
       balance,
       checked,
-      maticBalance
+      maticBalance,
     } = this.state;
 
     const { chainId } = this.Store;
@@ -334,7 +337,7 @@ export default class BuyTokens extends Base {
                     color: "black",
                     fontWeight: "bold",
                   }}
-                  label={`350 assigned, ${minted} sold`}
+                  // label={`350 assigned, ${minted} sold`}
                 />
                 <ProgressBar
                   striped
@@ -347,7 +350,7 @@ export default class BuyTokens extends Base {
                 <div className={"underProgress centered"}>
                   {minted < 250 ? (
                     <span>
-                      Tokens available for sale: {250 - minted}. Price 500
+                      Total supply: <b>600</b> | Left for sale: <b>{250 - minted}</b> | Price: <b>500</b>
                       MATIC.
                     </span>
                   ) : (
@@ -424,7 +427,7 @@ export default class BuyTokens extends Base {
                   >
                     Buy now!
                   </Button>
-                  <div className={'balance'}>
+                  <div className={"balance"}>
                     Your MATIC balance: <b>{maticBalance}</b>
                   </div>
                 </div>
@@ -467,7 +470,11 @@ export default class BuyTokens extends Base {
         {/*    </Col>*/}
         {/*  </Row>*/}
         {/*) : null}*/}
-        <Row><Col><div style={{height: 100}}/></Col></Row>
+        <Row>
+          <Col>
+            <div style={{ height: 100 }} />
+          </Col>
+        </Row>
       </div>
     );
   }
