@@ -206,9 +206,10 @@ export default class BuyTokens extends Base {
   }
 
   getFarm() {
-    return this.Store.chainId === 137
-      ? this.Store.contracts.GenesisFarm
-      : this.Store.contracts.GenesisFarm2;
+    // return this.Store.chainId === 137
+    //   ? this.Store.contracts.GenesisFarm
+    //   :
+      return this.Store.contracts.GenesisFarm2;
   }
 
   async withdraw() {
@@ -430,29 +431,29 @@ export default class BuyTokens extends Base {
         /// ADMIN
         */}
 
-        {isOwner ? (
-          <Row style={{ marginTop: 48 }}>
-            <Col style={{ textAlign: "right" }}>
-              <FormGroup
-                name={"amount2"}
-                thiz={this}
-                placeholder={"Amount"}
-                divCls={"shortInput floatRight"}
-              />
-              <FormGroup
-                name={"address"}
-                thiz={this}
-                placeholder={"Address"}
-                divCls={"shortInput floatRight"}
-              />
-            </Col>
-            <Col>
-              <Button size={"lg"} onClick={this.withdraw}>
-                Get!
-              </Button>
-            </Col>
-          </Row>
-        ) : null}
+        {/*{isOwner ? (*/}
+        {/*  <Row style={{ marginTop: 48 }}>*/}
+        {/*    <Col style={{ textAlign: "right" }}>*/}
+        {/*      <FormGroup*/}
+        {/*        name={"amount2"}*/}
+        {/*        thiz={this}*/}
+        {/*        placeholder={"Amount"}*/}
+        {/*        divCls={"shortInput floatRight"}*/}
+        {/*      />*/}
+        {/*      <FormGroup*/}
+        {/*        name={"address"}*/}
+        {/*        thiz={this}*/}
+        {/*        placeholder={"Address"}*/}
+        {/*        divCls={"shortInput floatRight"}*/}
+        {/*      />*/}
+        {/*    </Col>*/}
+        {/*    <Col>*/}
+        {/*      <Button size={"lg"} onClick={this.withdraw}>*/}
+        {/*        Get!*/}
+        {/*      </Button>*/}
+        {/*    </Col>*/}
+        {/*  </Row>*/}
+        {/*) : null}*/}
 
         {isOwner ? (
           <Row style={{ marginTop: 48 }}>
