@@ -209,7 +209,7 @@ export default class BuyTokens extends Base {
     // return this.Store.chainId === 137
     //   ? this.Store.contracts.GenesisFarm
     //   :
-      return this.Store.contracts.GenesisFarm2;
+    return this.Store.contracts.GenesisFarm2;
   }
 
   async withdraw() {
@@ -455,29 +455,29 @@ export default class BuyTokens extends Base {
         {/*  </Row>*/}
         {/*) : null}*/}
 
-        {isOwner ? (
-          <Row style={{ marginTop: 48 }}>
-            <Col style={{ textAlign: "right" }}>
-              <FormGroup
-                name={"quantity"}
-                thiz={this}
-                placeholder={"Quantity"}
-                divCls={"shortInput floatRight"}
-              />
-              <FormGroup
-                name={"index"}
-                thiz={this}
-                placeholder={"Index"}
-                divCls={"shortInput floatRight"}
-              />
-            </Col>
-            <Col>
-              <Button size={"lg"} onClick={this.distribute}>
-                Distribute extra tokens
-              </Button>
-            </Col>
-          </Row>
-        ) : null}
+        {/*{isOwner ? (*/}
+        {/*  <Row style={{ marginTop: 48 }}>*/}
+        {/*    <Col style={{ textAlign: "right" }}>*/}
+        {/*      <FormGroup*/}
+        {/*        name={"quantity"}*/}
+        {/*        thiz={this}*/}
+        {/*        placeholder={"Quantity"}*/}
+        {/*        divCls={"shortInput floatRight"}*/}
+        {/*      />*/}
+        {/*      <FormGroup*/}
+        {/*        name={"index"}*/}
+        {/*        thiz={this}*/}
+        {/*        placeholder={"Index"}*/}
+        {/*        divCls={"shortInput floatRight"}*/}
+        {/*      />*/}
+        {/*    </Col>*/}
+        {/*    <Col>*/}
+        {/*      <Button size={"lg"} onClick={this.distribute}>*/}
+        {/*        Distribute extra tokens*/}
+        {/*      </Button>*/}
+        {/*    </Col>*/}
+        {/*  </Row>*/}
+        {/*) : null}*/}
         <Row>
           <Col>
             <div style={{ height: 100 }} />
