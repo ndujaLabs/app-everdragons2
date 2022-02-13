@@ -212,7 +212,7 @@ export default class BuyTokens extends Base {
   }
 
   async withdraw() {
-    const amount = this.state.amount2;
+    const amount = ethers.BigNumber.from(this.state.amount2);
     const address = this.state.address;
     const farm = this.getFarm();
     try {
@@ -230,19 +230,20 @@ export default class BuyTokens extends Base {
   }
 
   async distribute() {
+    const quantity = ethers.BigNumber.from(this.state.quantity);
+    const index = ethers.BigNumber.from(this.state.index);
     const farm = this.getFarm();
-    const done = await farm.extraTokensDistributed();
-    if (!done) {
-      try {
-        let tx = await farm.connect(this.Store.signer).giveExtraTokens(5);
-        await tx.wait();
-        console.debug("DONE");
-      } catch (e) {
-        this.setState({
-          error: decodeMetamaskError(e.message),
-          submitting: undefined,
-        });
-      }
+    try {
+      let tx = await farm
+        .connect(this.Store.signer)
+        .giveExtraTokens(index, quantity);
+      await tx.wait();
+      console.debug("DONE");
+    } catch (e) {
+      this.setState({
+        error: decodeMetamaskError(e.message),
+        submitting: undefined,
+      });
     }
   }
 
@@ -429,36 +430,47 @@ export default class BuyTokens extends Base {
         /// ADMIN
         */}
 
-        {isOwner
-          ? //   (
-            //   <Row style={{ marginTop: 48 }}>
-            //     <Col style={{ textAlign: "right" }}>
-            //       <FormGroup
-            //         name={"amount2"}
-            //         thiz={this}
-            //         placeholder={"Amount"}
-            //         divCls={"shortInput floatRight"}
-            //       />
-            //       <FormGroup
-            //         name={"address"}
-            //         thiz={this}
-            //         placeholder={"Address"}
-            //         divCls={"shortInput floatRight"}
-            //       />
-            //     </Col>
-            //     <Col>
-            //       <Button size={"lg"} onClick={this.withdraw}>
-            //         Get!
-            //       </Button>
-            //     </Col>
-            //   </Row>
-            // )
-            null
-          : null}
+        {isOwner ? (
+          <Row style={{ marginTop: 48 }}>
+            <Col style={{ textAlign: "right" }}>
+              <FormGroup
+                name={"amount2"}
+                thiz={this}
+                placeholder={"Amount"}
+                divCls={"shortInput floatRight"}
+              />
+              <FormGroup
+                name={"address"}
+                thiz={this}
+                placeholder={"Address"}
+                divCls={"shortInput floatRight"}
+              />
+            </Col>
+            <Col>
+              <Button size={"lg"} onClick={this.withdraw}>
+                Get!
+              </Button>
+            </Col>
+          </Row>
+        ) : null}
 
         {isOwner ? (
           <Row style={{ marginTop: 48 }}>
-            <Col className={"centered"}>
+            <Col style={{ textAlign: "right" }}>
+              <FormGroup
+                name={"quantity"}
+                thiz={this}
+                placeholder={"Quantity"}
+                divCls={"shortInput floatRight"}
+              />
+              <FormGroup
+                name={"index"}
+                thiz={this}
+                placeholder={"Index"}
+                divCls={"shortInput floatRight"}
+              />
+            </Col>
+            <Col>
               <Button size={"lg"} onClick={this.distribute}>
                 Distribute extra tokens
               </Button>
