@@ -35,12 +35,14 @@ export default class BuyTokens extends Base {
     this.bindMany([
       "handleChange",
       "handleBlur",
-      "submit",
+      "buy",
       "getValues",
-      "submit2",
+      "withdraw",
       "checkAmount",
       "copyToClipboard",
       "showHowToAdd",
+      "getFarm",
+      "distribute",
     ]);
   }
 
@@ -124,8 +126,12 @@ export default class BuyTokens extends Base {
   }
 
   async getValues() {
-    const { GenesisFarm, Everdragons2Genesis } = this.Store.contracts;
-    if (GenesisFarm.address !== ethers.constants.AddressZero) {
+    const { Everdragons2Genesis } = this.Store.contracts;
+    const farm = this.getFarm();
+    const maxForSale = (await farm.maxForSale()).toNumber();
+    const maxClaimable = (await farm.maxClaimable()).toNumber();
+    const maxSupply = maxForSale + maxClaimable;
+    if (farm.address !== ethers.constants.AddressZero) {
       let maticBalance = await this.Store.provider.getBalance(
         this.Store.connectedWallet
       );
@@ -134,39 +140,29 @@ export default class BuyTokens extends Base {
         tmp[1] = tmp[1].substring(0, 2);
       }
       maticBalance = tmp[1] ? tmp.join(".") : tmp[0];
-
       const price =
-        this.state.price || ethers.utils.formatEther(await GenesisFarm.price());
-      const saleStartAt = (await GenesisFarm.saleStartAt()).toNumber() * 1000;
-      let saleStarted = false;
-      let saleStartIn = 0;
-      if (Date.now() > saleStartAt) {
-        saleStarted = true;
-      } else {
-        saleStartIn = saleStartAt - Date.now();
-      }
-      const nextTokenId = saleStarted
-        ? (await GenesisFarm.nextTokenId()).toNumber()
-        : 351;
+        this.state.price || ethers.utils.formatEther(await farm.price());
+      const nextTokenId = (await farm.nextTokenId()).toNumber();
       const minted = nextTokenId - 351;
-      const progress = Math.ceil((minted * 100) / 600);
-      const balance = saleStarted
-        ? (
-            await Everdragons2Genesis.balanceOf(this.Store.connectedWallet)
-          ).toNumber()
-        : 0;
+      const progress = Math.ceil((minted * 100) / maxSupply);
+      const base = Math.ceil((350 * 100) / maxSupply);
+      const balance = (
+        await Everdragons2Genesis.balanceOf(this.Store.connectedWallet)
+      ).toNumber();
       const isOwner = Address.equal(
         await Everdragons2Genesis.owner(),
         this.Store.connectedWallet
       );
       this.setState({
-        saleStarted,
-        saleStartIn,
         price,
         minted,
+        base,
         progress,
         balance,
         isOwner,
+        maxSupply,
+        maxForSale,
+        maxClaimable,
         checked: true,
         maticBalance,
       });
@@ -178,21 +174,18 @@ export default class BuyTokens extends Base {
     this.setTimeout(this.getValues, 30000);
   }
 
-  async submit() {
+  async buy() {
     const amount = this.state.amount;
     if (amount > 0 && amount <= 10) {
       this.setState({
         submitting: "Waiting for response",
         error: undefined,
       });
-      const { GenesisFarm } = this.Store.contracts;
+      const farm = this.getFarm();
       try {
-        let tx = await GenesisFarm.connect(this.Store.signer).buyTokens(
-          amount,
-          {
-            value: (await GenesisFarm.price()).mul(amount),
-          }
-        );
+        let tx = await farm.connect(this.Store.signer).buyTokens(amount, {
+          value: (await farm.price()).mul(amount),
+        });
         await tx.wait();
         this.setState({
           congratulations: true,
@@ -212,22 +205,40 @@ export default class BuyTokens extends Base {
     }
   }
 
-  async submit2() {
-    const amount = this.state.amount2;
-    const address = this.state.address;
+  getFarm() {
+    return this.Store.chainId === 137
+      ? this.Store.contracts.GenesisFarm
+      : this.Store.contracts.GenesisFarm2;
+  }
 
-    const { GenesisFarm } = this.Store.contracts;
+  async withdraw() {
+    const amount = ethers.BigNumber.from(this.state.amount2);
+    const address = this.state.address;
+    const farm = this.getFarm();
     try {
-      let tx = await GenesisFarm.connect(this.Store.signer).withdrawProceeds(
-        address,
-        amount
-      );
+      let tx = await farm
+        .connect(this.Store.signer)
+        .withdrawProceeds(address, amount);
       await tx.wait();
+      console.debug("DONE");
+    } catch (e) {
       this.setState({
-        congratulations: true,
+        error: decodeMetamaskError(e.message),
         submitting: undefined,
       });
-      this.getValues();
+    }
+  }
+
+  async distribute() {
+    const quantity = ethers.BigNumber.from(this.state.quantity);
+    const index = ethers.BigNumber.from(this.state.index);
+    const farm = this.getFarm();
+    try {
+      let tx = await farm
+        .connect(this.Store.signer)
+        .giveExtraTokens(index, quantity);
+      await tx.wait();
+      console.debug("DONE");
     } catch (e) {
       this.setState({
         error: decodeMetamaskError(e.message),
@@ -241,15 +252,17 @@ export default class BuyTokens extends Base {
       submitting,
       total,
       price,
-      // isOwner,
+      isOwner,
+      base,
       progress,
-      saleStarted,
-      saleStartIn,
       error,
       minted,
       balance,
       checked,
       maticBalance,
+      maxSupply,
+      maxForSale,
+      maxClaimable,
     } = this.state;
 
     const { chainId } = this.Store;
@@ -264,22 +277,6 @@ export default class BuyTokens extends Base {
       );
     }
 
-    if (!saleStarted && !saleStartIn) {
-      return (
-        <Row>
-          <Col>
-            <h2 className={"centered mt24"}>
-              The sale will start Friday, February 11th, at 10 am PST
-            </h2>
-          </Col>
-        </Row>
-      );
-    }
-    let hours, minutes;
-    if (saleStartIn > 0) {
-      hours = parseInt(saleStartIn / 3600000);
-      minutes = parseInt((saleStartIn / 60000) % 60);
-    }
     return (
       <div>
         {chainId === 80001 ? (
@@ -293,21 +290,6 @@ export default class BuyTokens extends Base {
                   label={"Click here to switch to Polygon PoS"}
                   onClick={() => switchTo(137)}
                 />
-              </div>
-            </Col>
-            <Col lg={2} />
-          </Row>
-        ) : null}
-        {saleStartIn > 0 ? (
-          <Row>
-            <Col lg={2} />
-            <Col lg={8}>
-              <div
-                className={"textBlock centered"}
-                style={{ padding: 16, backgroundColor: "#cf9" }}
-              >
-                Sale starts in {hours > 0 ? `${hours} hours and ` : ""}
-                {minutes} minutes
               </div>
             </Col>
             <Col lg={2} />
@@ -329,7 +311,7 @@ export default class BuyTokens extends Base {
               <ProgressBar>
                 <ProgressBar
                   variant="warning"
-                  now={59 + progress}
+                  now={base + progress}
                   key={2}
                   style={{
                     textShadow: "0 0 3px white",
@@ -342,16 +324,16 @@ export default class BuyTokens extends Base {
                 <ProgressBar
                   striped
                   variant="success"
-                  now={100 - 59 - progress}
+                  now={100 - base - progress}
                   key={1}
                 />
               </ProgressBar>
               {price ? (
                 <div className={"underProgress centered"}>
-                  {minted < 250 ? (
+                  {minted < maxForSale ? (
                     <span>
-                      Total supply: <b>600</b> | Left for sale:{" "}
-                      <b>{250 - minted}</b> | Price: <b>500</b>
+                      Total supply: <b>{maxSupply}</b> | Left for sale:{" "}
+                      <b>{maxForSale - minted}</b> | Price: <b>{price}</b>
                       <span style={{ fontSize: "80%" }}> MATIC</span>
                     </span>
                   ) : (
@@ -396,7 +378,7 @@ export default class BuyTokens extends Base {
           </Row>
         ) : null}
 
-        {saleStartIn > 0 ? null : minted < 250 ? (
+        {minted < maxForSale ? (
           <Row>
             <Col style={{ textAlign: "right" }}>
               <FormGroup
@@ -422,7 +404,7 @@ export default class BuyTokens extends Base {
                   <Button
                     size={"lg"}
                     disabled={submitting}
-                    onClick={this.submit}
+                    onClick={this.buy}
                     className={"shortInput"}
                     variant={"success"}
                   >
@@ -448,29 +430,53 @@ export default class BuyTokens extends Base {
         /// ADMIN
         */}
 
-        {/*{isOwner ? (*/}
-        {/*  <Row style={{ marginTop: 48 }}>*/}
-        {/*    <Col style={{ textAlign: "right" }}>*/}
-        {/*      <FormGroup*/}
-        {/*        name={"amount2"}*/}
-        {/*        thiz={this}*/}
-        {/*        placeholder={"Amount"}*/}
-        {/*        divCls={"shortInput floatRight"}*/}
-        {/*      />*/}
-        {/*      <FormGroup*/}
-        {/*        name={"address"}*/}
-        {/*        thiz={this}*/}
-        {/*        placeholder={"Address"}*/}
-        {/*        divCls={"shortInput floatRight"}*/}
-        {/*      />*/}
-        {/*    </Col>*/}
-        {/*    <Col>*/}
-        {/*      <Button size={"lg"} onClick={this.submit2}>*/}
-        {/*        Get!*/}
-        {/*      </Button>*/}
-        {/*    </Col>*/}
-        {/*  </Row>*/}
-        {/*) : null}*/}
+        {isOwner ? (
+          <Row style={{ marginTop: 48 }}>
+            <Col style={{ textAlign: "right" }}>
+              <FormGroup
+                name={"amount2"}
+                thiz={this}
+                placeholder={"Amount"}
+                divCls={"shortInput floatRight"}
+              />
+              <FormGroup
+                name={"address"}
+                thiz={this}
+                placeholder={"Address"}
+                divCls={"shortInput floatRight"}
+              />
+            </Col>
+            <Col>
+              <Button size={"lg"} onClick={this.withdraw}>
+                Get!
+              </Button>
+            </Col>
+          </Row>
+        ) : null}
+
+        {isOwner ? (
+          <Row style={{ marginTop: 48 }}>
+            <Col style={{ textAlign: "right" }}>
+              <FormGroup
+                name={"quantity"}
+                thiz={this}
+                placeholder={"Quantity"}
+                divCls={"shortInput floatRight"}
+              />
+              <FormGroup
+                name={"index"}
+                thiz={this}
+                placeholder={"Index"}
+                divCls={"shortInput floatRight"}
+              />
+            </Col>
+            <Col>
+              <Button size={"lg"} onClick={this.distribute}>
+                Distribute extra tokens
+              </Button>
+            </Col>
+          </Row>
+        ) : null}
         <Row>
           <Col>
             <div style={{ height: 100 }} />

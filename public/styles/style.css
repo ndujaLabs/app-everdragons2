@@ -969,3 +969,13 @@ input::placeholder {
     color: crimson;
     font-weight: bold;
 }
+
+.h2smaller {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.sneakpeak {
+    width: 100%;
+    margin-bottom: 24px;
+}

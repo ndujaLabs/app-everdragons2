@@ -10,7 +10,7 @@ import * as Scroll from "react-scroll";
 // import { ethers } from "ethers";
 import { switchTo } from "../utils/networkUtils";
 // eslint-disable-next-line no-undef
-import { Container, Row, Col } from "react-bootstrap";
+import { Container, Row, Col, ProgressBar } from "react-bootstrap";
 
 import Base from "./Base";
 import Ab from "./Ab";
@@ -20,18 +20,35 @@ export default class Home extends Base {
     super(props);
 
     this.state = {};
+    this.bindMany(["getCurrentStatus"]);
   }
 
   componentDidMount() {
     Scroll.animateScroll.scrollToTop();
+    if (!this.Store.connectedNetwork) {
+      this.getCurrentStatus();
+    }
+  }
+
+  async getCurrentStatus() {
+    const res = await this.request("/get-current-status", "get");
+    if (res.success && !this.Store.connectedNetwork) {
+      this.setStore({
+        currentTotalSupply: res.totalSupply,
+      });
+    }
   }
 
   render() {
     const { connectedWallet, connectedNetwork } = this.Store;
+    const currentTotalSupply = this.Store.currentTotalSupply || 0;
 
     // if (!discordUser) {
     //   return <Redirect to={"/welcome"} />;
     // }
+
+    const progress = Math.ceil((currentTotalSupply * 100) / 1000);
+    const base = Math.ceil((350 * 100) / 1000);
 
     return (
       <Container style={{ marginTop: 100 }}>
@@ -54,13 +71,24 @@ export default class Home extends Base {
           </Row>
         </MobileView>
         <BrowserView>
+          {connectedNetwork ? null : (
+            <Row>
+              <Col lg={2} />
+              <Col lg={8}>
+                <div className={"mt24 likeh2"}>
+                  Get Everdragons2 Genesis Tokens
+                </div>
+              </Col>
+              <Col lg={2} />
+            </Row>
+          )}
           {connectedWallet ? (
             connectedNetwork ? (
               <BuyTokens Store={this.Store} setStore={this.setStore} />
             ) : (
               <Row>
                 <Col>
-                  <h2 className={"centered mt24"}>
+                  <h2 className={"centered mt24 h2smaller"}>
                     Please, connect your wallet to Polygon PoS.
                     <br />
                     <Ab
@@ -81,7 +109,85 @@ export default class Home extends Base {
               </Col>
             </Row>
           )}
+          {connectedNetwork ? null : (
+            <Row>
+              <Col lg={2} />
+              <Col lg={8}>
+                <div className={"padded"}>
+                  <ProgressBar>
+                    <ProgressBar
+                      variant="warning"
+                      now={base + progress}
+                      key={2}
+                      style={{
+                        textShadow: "0 0 3px white",
+                        backgroundImage: "linear-gradient(orange, gold)",
+                        color: "black",
+                        fontWeight: "bold",
+                      }}
+                      // label={`350 assigned, ${minted} sold`}
+                    />
+                    <ProgressBar
+                      striped
+                      variant="success"
+                      now={100 - base - progress}
+                      key={1}
+                    />
+                  </ProgressBar>
+                  <div className={"underProgress centered"}>
+                    <span>
+                      Total supply: <b>1000</b> | Left for sale:{" "}
+                      <b>{650 - currentTotalSupply}</b> | Price: <b>100</b>
+                      <span style={{ fontSize: "80%" }}> MATIC</span>
+                    </span>
+                  </div>
+                </div>
+              </Col>
+              <Col lg={2} />
+            </Row>
+          )}
         </BrowserView>
+        <Row>
+          <Col lg={4} xs={1}>
+            <img
+              className={"sneakpeak"}
+              src={"https://img.everdragons2.com/assets/animation1.gif"}
+            />
+          </Col>
+          <Col lg={4} xs={1}>
+            <img
+              className={"sneakpeak"}
+              src={"https://img.everdragons2.com/assets/animation2.gif"}
+            />
+          </Col>
+          <Col lg={4} xs={1}>
+            <img
+              className={"sneakpeak"}
+              src={"https://img.everdragons2.com/assets/animation3.gif"}
+            />
+          </Col>
+        </Row>
+        <Row>
+          <Col lg={4} xs={1}>
+            <img
+              className={"sneakpeak"}
+              src={"https://img.everdragons2.com/assets/animation4.gif"}
+            />
+          </Col>
+          <Col lg={4} xs={1}>
+            <img
+              className={"sneakpeak"}
+              src={"https://img.everdragons2.com/assets/animation5.gif"}
+            />
+          </Col>
+          <Col lg={4} xs={1}>
+            <img
+              className={"sneakpeak"}
+              src={"https://img.everdragons2.com/assets/animation6.gif"}
+            />
+          </Col>
+        </Row>
+        <div style={{ height: 100 }}></div>
       </Container>
     );
   }
