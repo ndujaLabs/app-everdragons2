@@ -128,9 +128,9 @@ export default class BuyTokens extends Base {
   async getValues() {
     const { Everdragons2Genesis } = this.Store.contracts;
     const farm = this.getFarm();
-    const maxForSale = (await farm.maxForSale()).toNumber()
-    const maxClaimable = (await farm.maxClaimable()).toNumber()
-    const maxSupply = maxForSale + maxClaimable
+    const maxForSale = (await farm.maxForSale()).toNumber();
+    const maxClaimable = (await farm.maxClaimable()).toNumber();
+    const maxSupply = maxForSale + maxClaimable;
     if (farm.address !== ethers.constants.AddressZero) {
       let maticBalance = await this.Store.provider.getBalance(
         this.Store.connectedWallet
@@ -216,7 +216,9 @@ export default class BuyTokens extends Base {
     const address = this.state.address;
     const farm = this.getFarm();
     try {
-      let tx = await farm.connect(this.Store.signer).withdrawProceeds(address, amount);
+      let tx = await farm
+        .connect(this.Store.signer)
+        .withdrawProceeds(address, amount);
       await tx.wait();
       console.debug("DONE");
     } catch (e) {
@@ -259,7 +261,7 @@ export default class BuyTokens extends Base {
       maticBalance,
       maxSupply,
       maxForSale,
-      maxClaimable
+      maxClaimable,
     } = this.state;
 
     const { chainId } = this.Store;
@@ -328,11 +330,11 @@ export default class BuyTokens extends Base {
               {price ? (
                 <div className={"underProgress centered"}>
                   {minted < maxForSale ? (
-                      <span>
-                        Total supply: <b>{maxSupply}</b> | Left for sale:{" "}
-                        <b>{maxForSale - minted}</b> | Price: <b>{price}</b>
-                        <span style={{ fontSize: "80%" }}> MATIC</span>
-                      </span>
+                    <span>
+                      Total supply: <b>{maxSupply}</b> | Left for sale:{" "}
+                      <b>{maxForSale - minted}</b> | Price: <b>{price}</b>
+                      <span style={{ fontSize: "80%" }}> MATIC</span>
+                    </span>
                   ) : (
                     "Sold out."
                   )}
