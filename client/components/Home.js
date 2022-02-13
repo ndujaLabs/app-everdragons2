@@ -149,27 +149,45 @@ export default class Home extends Base {
         </BrowserView>
         <Row>
           <Col lg={4} xs={1}>
-          <img className={'sneakpeak'}  src={'https://img.everdragons2.com/assets/animation1.gif'}/>
-        </Col>
-          <Col lg={4} xs={1}>
-            <img className={'sneakpeak'}  src={'https://img.everdragons2.com/assets/animation2.gif'}/>
+            <img
+              className={"sneakpeak"}
+              src={"https://img.everdragons2.com/assets/animation1.gif"}
+            />
           </Col>
           <Col lg={4} xs={1}>
-            <img className={'sneakpeak'}  src={'https://img.everdragons2.com/assets/animation3.gif'}/>
+            <img
+              className={"sneakpeak"}
+              src={"https://img.everdragons2.com/assets/animation2.gif"}
+            />
+          </Col>
+          <Col lg={4} xs={1}>
+            <img
+              className={"sneakpeak"}
+              src={"https://img.everdragons2.com/assets/animation3.gif"}
+            />
           </Col>
         </Row>
         <Row>
           <Col lg={4} xs={1}>
-            <img className={'sneakpeak'} src={'https://img.everdragons2.com/assets/animation4.gif'}/>
+            <img
+              className={"sneakpeak"}
+              src={"https://img.everdragons2.com/assets/animation4.gif"}
+            />
           </Col>
           <Col lg={4} xs={1}>
-            <img className={'sneakpeak'}  src={'https://img.everdragons2.com/assets/animation5.gif'}/>
+            <img
+              className={"sneakpeak"}
+              src={"https://img.everdragons2.com/assets/animation5.gif"}
+            />
           </Col>
           <Col lg={4} xs={1}>
-            <img className={'sneakpeak'}  src={'https://img.everdragons2.com/assets/animation6.gif'}/>
+            <img
+              className={"sneakpeak"}
+              src={"https://img.everdragons2.com/assets/animation6.gif"}
+            />
           </Col>
         </Row>
-        <div style={{height:100}}></div>
+        <div style={{ height: 100 }}></div>
       </Container>
     );
   }
