@@ -35,13 +35,14 @@ export default class BuyTokens extends Base {
     this.bindMany([
       "handleChange",
       "handleBlur",
-      "submit",
+      "buy",
       "getValues",
-      "submit2",
+      "withdraw",
       "checkAmount",
       "copyToClipboard",
       "showHowToAdd",
-      "getFarm"
+      "getFarm",
+      "distribute",
     ]);
   }
 
@@ -126,7 +127,10 @@ export default class BuyTokens extends Base {
 
   async getValues() {
     const { Everdragons2Genesis } = this.Store.contracts;
-    const farm = this.getFarm()
+    const farm = this.getFarm();
+    const maxForSale = (await farm.maxForSale()).toNumber()
+    const maxClaimable = (await farm.maxClaimable()).toNumber()
+    const maxSupply = maxForSale + maxClaimable
     if (farm.address !== ethers.constants.AddressZero) {
       let maticBalance = await this.Store.provider.getBalance(
         this.Store.connectedWallet
@@ -138,12 +142,13 @@ export default class BuyTokens extends Base {
       maticBalance = tmp[1] ? tmp.join(".") : tmp[0];
       const price =
         this.state.price || ethers.utils.formatEther(await farm.price());
-      const nextTokenId = (await farm.nextTokenId()).toNumber()
+      const nextTokenId = (await farm.nextTokenId()).toNumber();
       const minted = nextTokenId - 351;
-      const progress = Math.ceil((minted * 100) / 600);
+      const progress = Math.ceil((minted * 100) / maxSupply);
+      const base = Math.ceil((350 * 100) / maxSupply);
       const balance = (
-            await Everdragons2Genesis.balanceOf(this.Store.connectedWallet)
-          ).toNumber()
+        await Everdragons2Genesis.balanceOf(this.Store.connectedWallet)
+      ).toNumber();
       const isOwner = Address.equal(
         await Everdragons2Genesis.owner(),
         this.Store.connectedWallet
@@ -151,9 +156,13 @@ export default class BuyTokens extends Base {
       this.setState({
         price,
         minted,
+        base,
         progress,
         balance,
         isOwner,
+        maxSupply,
+        maxForSale,
+        maxClaimable,
         checked: true,
         maticBalance,
       });
@@ -165,21 +174,18 @@ export default class BuyTokens extends Base {
     this.setTimeout(this.getValues, 30000);
   }
 
-  async submit() {
+  async buy() {
     const amount = this.state.amount;
     if (amount > 0 && amount <= 10) {
       this.setState({
         submitting: "Waiting for response",
         error: undefined,
       });
-      const farm = this.getFarm()
+      const farm = this.getFarm();
       try {
-        let tx = await farm.connect(this.Store.signer).buyTokens(
-          amount,
-          {
-            value: (await farm.price()).mul(amount),
-          }
-        );
+        let tx = await farm.connect(this.Store.signer).buyTokens(amount, {
+          value: (await farm.price()).mul(amount),
+        });
         await tx.wait();
         this.setState({
           congratulations: true,
@@ -200,25 +206,19 @@ export default class BuyTokens extends Base {
   }
 
   getFarm() {
-    return (this.Store.chainId === 137 ? this.Store.contracts.GenesisFarm : this.Store.contracts.GenesisFarm2)
+    return this.Store.chainId === 137
+      ? this.Store.contracts.GenesisFarm
+      : this.Store.contracts.GenesisFarm2;
   }
 
-  async submit2() {
+  async withdraw() {
     const amount = this.state.amount2;
     const address = this.state.address;
-
-    const farm = this.getFarm()
+    const farm = this.getFarm();
     try {
-      let tx = await farm.connect(this.Store.signer).withdrawProceeds(
-        address,
-        amount
-      );
+      let tx = await farm.connect(this.Store.signer).withdrawProceeds(address, amount);
       await tx.wait();
-      this.setState({
-        congratulations: true,
-        submitting: undefined,
-      });
-      this.getValues();
+      console.debug("DONE");
     } catch (e) {
       this.setState({
         error: decodeMetamaskError(e.message),
@@ -227,18 +227,39 @@ export default class BuyTokens extends Base {
     }
   }
 
+  async distribute() {
+    const farm = this.getFarm();
+    const done = await farm.extraTokensDistributed();
+    if (!done) {
+      try {
+        let tx = await farm.connect(this.Store.signer).giveExtraTokens(5);
+        await tx.wait();
+        console.debug("DONE");
+      } catch (e) {
+        this.setState({
+          error: decodeMetamaskError(e.message),
+          submitting: undefined,
+        });
+      }
+    }
+  }
+
   render() {
     const {
       submitting,
       total,
       price,
-      // isOwner,
+      isOwner,
+      base,
       progress,
       error,
       minted,
       balance,
       checked,
       maticBalance,
+      maxSupply,
+      maxForSale,
+      maxClaimable
     } = this.state;
 
     const { chainId } = this.Store;
@@ -253,7 +274,6 @@ export default class BuyTokens extends Base {
       );
     }
 
-    let hours, minutes;
     return (
       <div>
         {chainId === 80001 ? (
@@ -288,7 +308,7 @@ export default class BuyTokens extends Base {
               <ProgressBar>
                 <ProgressBar
                   variant="warning"
-                  now={59 + progress}
+                  now={base + progress}
                   key={2}
                   style={{
                     textShadow: "0 0 3px white",
@@ -301,18 +321,18 @@ export default class BuyTokens extends Base {
                 <ProgressBar
                   striped
                   variant="success"
-                  now={100 - 59 - progress}
+                  now={100 - base - progress}
                   key={1}
                 />
               </ProgressBar>
               {price ? (
                 <div className={"underProgress centered"}>
-                  {minted < 250 ? (
-                    <span>
-                      Total supply: <b>1600</b> | Left for sale:{" "}
-                      <b>{1250 - minted}</b> | Price: <b>100</b>
-                      <span style={{ fontSize: "80%" }}> MATIC</span>
-                    </span>
+                  {minted < maxForSale ? (
+                      <span>
+                        Total supply: <b>{maxSupply}</b> | Left for sale:{" "}
+                        <b>{maxForSale - minted}</b> | Price: <b>{price}</b>
+                        <span style={{ fontSize: "80%" }}> MATIC</span>
+                      </span>
                   ) : (
                     "Sold out."
                   )}
@@ -355,7 +375,7 @@ export default class BuyTokens extends Base {
           </Row>
         ) : null}
 
-        {minted < 250 ? (
+        {minted < maxForSale ? (
           <Row>
             <Col style={{ textAlign: "right" }}>
               <FormGroup
@@ -381,7 +401,7 @@ export default class BuyTokens extends Base {
                   <Button
                     size={"lg"}
                     disabled={submitting}
-                    onClick={this.submit}
+                    onClick={this.buy}
                     className={"shortInput"}
                     variant={"success"}
                   >
@@ -407,29 +427,42 @@ export default class BuyTokens extends Base {
         /// ADMIN
         */}
 
-        {/*{isOwner ? (*/}
-        {/*  <Row style={{ marginTop: 48 }}>*/}
-        {/*    <Col style={{ textAlign: "right" }}>*/}
-        {/*      <FormGroup*/}
-        {/*        name={"amount2"}*/}
-        {/*        thiz={this}*/}
-        {/*        placeholder={"Amount"}*/}
-        {/*        divCls={"shortInput floatRight"}*/}
-        {/*      />*/}
-        {/*      <FormGroup*/}
-        {/*        name={"address"}*/}
-        {/*        thiz={this}*/}
-        {/*        placeholder={"Address"}*/}
-        {/*        divCls={"shortInput floatRight"}*/}
-        {/*      />*/}
-        {/*    </Col>*/}
-        {/*    <Col>*/}
-        {/*      <Button size={"lg"} onClick={this.submit2}>*/}
-        {/*        Get!*/}
-        {/*      </Button>*/}
-        {/*    </Col>*/}
-        {/*  </Row>*/}
-        {/*) : null}*/}
+        {isOwner
+          ? //   (
+            //   <Row style={{ marginTop: 48 }}>
+            //     <Col style={{ textAlign: "right" }}>
+            //       <FormGroup
+            //         name={"amount2"}
+            //         thiz={this}
+            //         placeholder={"Amount"}
+            //         divCls={"shortInput floatRight"}
+            //       />
+            //       <FormGroup
+            //         name={"address"}
+            //         thiz={this}
+            //         placeholder={"Address"}
+            //         divCls={"shortInput floatRight"}
+            //       />
+            //     </Col>
+            //     <Col>
+            //       <Button size={"lg"} onClick={this.withdraw}>
+            //         Get!
+            //       </Button>
+            //     </Col>
+            //   </Row>
+            // )
+            null
+          : null}
+
+        {isOwner ? (
+          <Row style={{ marginTop: 48 }}>
+            <Col className={"centered"}>
+              <Button size={"lg"} onClick={this.distribute}>
+                Distribute extra tokens
+              </Button>
+            </Col>
+          </Row>
+        ) : null}
         <Row>
           <Col>
             <div style={{ height: 100 }} />

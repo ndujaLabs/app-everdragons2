@@ -1,10 +1,7 @@
 const ethers = require("ethers");
 const { Contract } = require("@ethersproject/contracts");
 const config = require("../../client/config");
-const requireOrMock = require("require-or-mock");
-const apiKeys = requireOrMock("db/apiKeys.js", {
-  infuraApiKeys: "saieui32eh23hnieudfhnsi",
-});
+const { infuraApiKey } = require("../../env.json");
 
 module.exports = {
   sleep: async (millis) => {
@@ -12,18 +9,17 @@ module.exports = {
     return new Promise((resolve) => setTimeout(resolve, millis));
   },
 
-  getContract(chainId) {
-    if (config.supportedId[chainId]) {
-      let provider;
-      if (chainId === 1337) {
-        provider = new ethers.providers.JsonRpcProvider();
-      } else {
-        provider = new ethers.providers.InfuraProvider(
-          chainId,
-          apiKeys.infuraApiKey
-        );
-      }
-      return new Contract(config.address[chainId], config.abi, provider);
+  getContracts() {
+    let provider = new ethers.providers.InfuraProvider("matic", infuraApiKey);
+    let contracts = {};
+    let addresses = config.contracts[137];
+    for (let contractName in addresses) {
+      contracts[contractName] = new Contract(
+        addresses[contractName],
+        config.abi[contractName],
+        provider
+      );
     }
+    return contracts;
   },
 };
