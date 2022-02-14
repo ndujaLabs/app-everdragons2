@@ -13,7 +13,7 @@ export default class Loading extends React.Component {
           variant={variant}
           animation={animation || "border"}
           role="status"
-          style={style||{}}
+          style={style || {}}
         />
       </div>
     );
@@ -23,5 +23,5 @@ export default class Loading extends React.Component {
 Loading.propTypes = {
   variant: PropTypes.string,
   animation: PropTypes.string,
-  style: PropTypes.object
+  style: PropTypes.object,
 };

@@ -188,7 +188,7 @@ export default class BuyTokens extends Base {
         });
         this.setState({
           submitting: "Waiting for confirmation",
-        })
+        });
         await tx.wait();
         this.setState({
           congratulations: true,
@@ -398,8 +398,18 @@ export default class BuyTokens extends Base {
             <Col className={"mt4"}>
               {submitting ? (
                 <div>
-                  <div className={'submittingNow'}><Loading style={{width: 50, height: 50, float: 'left', marginRight: 6}} variant={'warning'} animation={'grow'}/>
-                  <div className={'pulsate'}>{submitting}</div>
+                  <div className={"submittingNow"}>
+                    <Loading
+                      style={{
+                        width: 50,
+                        height: 50,
+                        float: "left",
+                        marginRight: 6,
+                      }}
+                      variant={"warning"}
+                      animation={"grow"}
+                    />
+                    <div className={"pulsate"}>{submitting}</div>
                   </div>
                 </div>
               ) : (
