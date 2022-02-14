@@ -156,7 +156,7 @@ export default class Header extends Base {
           )}
         </Navbar.Collapse>
         <Navbar.Collapse className="justify-content-end">
-          {this.Store.discordUser ? (
+          {this.Store.discordUser?.username ? (
             <Navbar.Text>
               Hi <strong>{this.Store.discordUser.username}</strong>
             </Navbar.Text>
