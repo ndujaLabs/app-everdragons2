@@ -178,7 +178,7 @@ export default class BuyTokens extends Base {
     const amount = this.state.amount;
     if (amount > 0 && amount <= 10) {
       this.setState({
-        submitting: "Waiting for response",
+        submitting: "Waiting for approval",
         error: undefined,
       });
       const farm = this.getFarm();
@@ -186,6 +186,9 @@ export default class BuyTokens extends Base {
         let tx = await farm.connect(this.Store.signer).buyTokens(amount, {
           value: (await farm.price()).mul(amount),
         });
+        this.setState({
+          submitting: "Waiting for confirmation",
+        })
         await tx.wait();
         this.setState({
           congratulations: true,
@@ -395,9 +398,8 @@ export default class BuyTokens extends Base {
             <Col className={"mt4"}>
               {submitting ? (
                 <div>
-                  <div>{submitting}</div>
-                  <div style={{ clear: "both" }}>
-                    <Loading />
+                  <div className={'submittingNow'}><Loading style={{width: 50, height: 50, float: 'left', marginRight: 6}} variant={'warning'} animation={'grow'}/>
+                  <div className={'pulsate'}>{submitting}</div>
                   </div>
                 </div>
               ) : (
