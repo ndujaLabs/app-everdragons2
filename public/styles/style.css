@@ -979,27 +979,3 @@ input::placeholder {
     width: 100%;
     margin-bottom: 24px;
 }
-
-.submittingNow {
-    font-size: 1.3rem;
-    font-weight: bold;
-    color: crimson;
-}
-
-.pulsate {
-    -webkit-animation: pulsate 1s ease-out;
-    -webkit-animation-iteration-count: infinite;
-    opacity: 0.2;
-    padding: 6px 0 0 6px;
-}
-@-webkit-keyframes pulsate {
-    0% {
-        opacity: 0.5;
-    }
-    50% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0.5;
-    }
-}
