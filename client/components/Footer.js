@@ -23,8 +23,8 @@ export default class Footer extends Base {
             {" "}
             For more info about the Everdragons2 project, visit{" "}
             <Ab
-              label={"https://everdragons.com"}
-              link={"https://everdragons.com"}
+              label={"https://everdragons2.com"}
+              link={"https://everdragons2.com"}
             />{" "}
           </div>
           (c) 2021-present{" "}
