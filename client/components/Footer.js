@@ -19,7 +19,16 @@ export default class Footer extends Base {
           className={"centered"}
           style={{ fontSize: "80%", width: "100%" }}
         >
-          (c) 2021 <Ab label={"'ndujaLabs"} link={"https://ndujalabs.com"} />
+          <div>
+            {" "}
+            For more info about the Everdragons2 project, visit{" "}
+            <Ab
+              label={"https://everdragons.com"}
+              link={"https://everdragons.com"}
+            />{" "}
+          </div>
+          (c) 2021-present{" "}
+          <Ab label={"'ndujaLabs"} link={"https://ndujalabs.com"} />
           {" | "}
           <a
             className="item"

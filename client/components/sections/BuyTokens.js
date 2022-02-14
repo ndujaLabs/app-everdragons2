@@ -197,7 +197,7 @@ export default class BuyTokens extends Base {
           total: 0,
         });
         // give time to Infura to update the info
-        this.setTimeout(this.getValues, 4444)
+        this.setTimeout(this.getValues, 4444);
       } catch (e) {
         this.setState({
           error: decodeMetamaskError(e.message),

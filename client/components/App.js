@@ -239,6 +239,7 @@ export default class App extends Common {
           </Switch>
           <Footer />
         </main>
+        <Footer />
         {show ? <PopUp modals={modals} /> : null}
       </BrowserRouter>
     );
