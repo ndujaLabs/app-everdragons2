@@ -147,40 +147,40 @@ export default class Home extends Base {
             </Row>
           )}
         </BrowserView>
-        <Row>
-          <Col lg={4} xs={1}>
+        <Row style={{ margin: "0 24px" }}>
+          <Col lg={4} md={6} xs={12}>
             <img
               className={"sneakpeak"}
               src={"https://img.everdragons2.com/assets/animation1.gif"}
             />
           </Col>
-          <Col lg={4} xs={1}>
+          <Col lg={4} md={6} xs={12}>
             <img
               className={"sneakpeak"}
               src={"https://img.everdragons2.com/assets/animation2.gif"}
             />
           </Col>
-          <Col lg={4} xs={1}>
+          <Col lg={4} md={6} xs={12}>
             <img
               className={"sneakpeak"}
               src={"https://img.everdragons2.com/assets/animation3.gif"}
             />
           </Col>
         </Row>
-        <Row>
-          <Col lg={4} xs={1}>
+        <Row style={{ margin: "0 24px" }}>
+          <Col lg={4} md={6} xs={12}>
             <img
               className={"sneakpeak"}
               src={"https://img.everdragons2.com/assets/animation4.gif"}
             />
           </Col>
-          <Col lg={4} xs={1}>
+          <Col lg={4} md={6} xs={12}>
             <img
               className={"sneakpeak"}
               src={"https://img.everdragons2.com/assets/animation5.gif"}
             />
           </Col>
-          <Col lg={4} xs={1}>
+          <Col lg={4} md={6} xs={12}>
             <img
               className={"sneakpeak"}
               src={"https://img.everdragons2.com/assets/animation6.gif"}

@@ -2,7 +2,7 @@
 import { Navbar, Nav, Button } from "react-bootstrap";
 
 // eslint-disable-next-line no-undef
-const { Link } = ReactRouterDOM;
+// const { Link } = ReactRouterDOM;
 import { BrowserView } from "react-device-detect";
 
 import Base from "./Base";
@@ -131,29 +131,32 @@ export default class Header extends Base {
           onClick={this.setExpanded}
         />
         <Navbar.Collapse id="navbarScroll">
-          {this.state.pathname === "/" ? (
-            <Nav className="mr-auto my-2 my-lg-0" navbarScroll>
-              <Scroll.Link
-                // offset={-80}
-                // spy={true}
-                // smooth={true}
-                to="howToBuy"
-                onClick={this.setExpanded}
-              >
-                How to buy MATIC
-              </Scroll.Link>
-            </Nav>
-          ) : (
-            <Nav
-              className="mr-auto my-2 my-lg-0"
-              style={{ maxHeight: "100px" }}
-              navbarScroll
-            >
-              <Nav.Link as={Link} to="/" onClick={this.setExpanded}>
-                Home
-              </Nav.Link>
-            </Nav>
-          )}
+          {
+            this.isMobile() ? null : (
+              <Nav className="mr-auto my-2 my-lg-0" navbarScroll>
+                <Scroll.Link
+                  // offset={-80}
+                  // spy={true}
+                  // smooth={true}
+                  to="howToBuy"
+                  onClick={this.setExpanded}
+                >
+                  How to buy MATIC
+                </Scroll.Link>
+              </Nav>
+            )
+            //   : (
+            //   <Nav
+            //     className="mr-auto my-2 my-lg-0"
+            //     style={{ maxHeight: "100px" }}
+            //     navbarScroll
+            //   >
+            //     <Nav.Link as={Link} to="/" onClick={this.setExpanded}>
+            //       Home
+            //     </Nav.Link>
+            //   </Nav>
+            // )
+          }
         </Navbar.Collapse>
         <Navbar.Collapse className="justify-content-end">
           {this.Store.discordUser?.username ? (
