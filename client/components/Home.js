@@ -187,6 +187,43 @@ export default class Home extends Base {
             />
           </Col>
         </Row>
+        <Scroll.Element name="howToBuy">
+          <Row>
+            <Col>
+              <h2 style={{ padding: "30px 0 20px" }}>How to buy MATIC</h2>
+            </Col>
+          </Row>
+        </Scroll.Element>
+        <Row>
+          <Col>
+            You can buy MATIC on many exchanges. We recommend Binance, Gate.io
+            or KuCoin as we know (from our community — big thanks!) that you can
+            withdraw directly into Metamask on Polygon Mainnet, paying
+            negligible fees.
+          </Col>
+          <Col>
+            Beware that other exchanges like Coinbase let you buy MATIC only on
+            the Ethereum network. If you have these, you have{" "}
+            <a
+              rel={"noreferrer"}
+              href={"https://wallet.polygon.technology/bridge/"}
+              target={"_blank"}
+            >
+              to bridge them to the Polygon network
+            </a>{" "}
+            (and you need a bit of ETH as well, to pay the transaction fees).
+          </Col>
+          <Col>
+            <p>
+              How much MATIC? You need 100 MATIC per NFT, plus a few cents for
+              gas fee.
+            </p>
+            <p>
+              Whatever path you choose, make sure you can see a positive balance
+              in your Metamask wallet on Polygon Mainnet (see top right).
+            </p>
+          </Col>
+        </Row>
         <div style={{ height: 100 }}></div>
       </Container>
     );

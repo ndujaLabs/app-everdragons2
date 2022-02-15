@@ -6,7 +6,7 @@ const { Link } = ReactRouterDOM;
 import { BrowserView } from "react-device-detect";
 
 import Base from "./Base";
-
+import * as Scroll from "react-scroll";
 export default class Header extends Base {
   constructor(props) {
     super(props);
@@ -133,15 +133,15 @@ export default class Header extends Base {
         <Navbar.Collapse id="navbarScroll">
           {this.state.pathname === "/" ? (
             <Nav className="mr-auto my-2 my-lg-0" navbarScroll>
-              {/*<Scroll.Link*/}
-              {/*  offset={-80}*/}
-              {/*  spy={true}*/}
-              {/*  smooth={true}*/}
-              {/*  to="intro"*/}
-              {/*  onClick={this.setExpanded}*/}
-              {/*>*/}
-              {/*  Intro*/}
-              {/*</Scroll.Link>*/}
+              <Scroll.Link
+                // offset={-80}
+                // spy={true}
+                // smooth={true}
+                to="howToBuy"
+                onClick={this.setExpanded}
+              >
+                How to buy MATIC
+              </Scroll.Link>
             </Nav>
           ) : (
             <Nav
