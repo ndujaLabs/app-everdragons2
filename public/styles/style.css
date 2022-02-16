@@ -978,6 +978,8 @@ input::placeholder {
 .sneakpeak {
     width: 100%;
     margin-bottom: 24px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
 }
 
 .submittingNow {

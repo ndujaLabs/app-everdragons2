@@ -151,19 +151,25 @@ export default class Home extends Base {
           <Col lg={4} md={6} xs={12}>
             <img
               className={"sneakpeak"}
-              src={"https://s3.us-west-1.amazonaws.com/img.everdragons2.com/assets/animation1.gif"}
+              src={
+                "https://s3.us-west-1.amazonaws.com/img.everdragons2.com/assets/animation1.gif"
+              }
             />
           </Col>
           <Col lg={4} md={6} xs={12}>
             <img
               className={"sneakpeak"}
-              src={"https://s3.us-west-1.amazonaws.com/img.everdragons2.com/assets/animation2.gif"}
+              src={
+                "https://s3.us-west-1.amazonaws.com/img.everdragons2.com/assets/animation2.gif"
+              }
             />
           </Col>
           <Col lg={4} md={6} xs={12}>
             <img
               className={"sneakpeak"}
-              src={"https://s3.us-west-1.amazonaws.com/img.everdragons2.com/assets/animation3.gif"}
+              src={
+                "https://s3.us-west-1.amazonaws.com/img.everdragons2.com/assets/animation3.gif"
+              }
             />
           </Col>
         </Row>
@@ -171,19 +177,25 @@ export default class Home extends Base {
           <Col lg={4} md={6} xs={12}>
             <img
               className={"sneakpeak"}
-              src={"https://s3.us-west-1.amazonaws.com/img.everdragons2.com/assets/animation4.gif"}
+              src={
+                "https://s3.us-west-1.amazonaws.com/img.everdragons2.com/assets/animation4.gif"
+              }
             />
           </Col>
           <Col lg={4} md={6} xs={12}>
             <img
               className={"sneakpeak"}
-              src={"https://s3.us-west-1.amazonaws.com/img.everdragons2.com/assets/animation5.gif"}
+              src={
+                "https://s3.us-west-1.amazonaws.com/img.everdragons2.com/assets/animation5.gif"
+              }
             />
           </Col>
           <Col lg={4} md={6} xs={12}>
             <img
               className={"sneakpeak"}
-              src={"https://s3.us-west-1.amazonaws.com/img.everdragons2.com/assets/animation6.gif"}
+              src={
+                "https://s3.us-west-1.amazonaws.com/img.everdragons2.com/assets/animation6.gif"
+              }
             />
           </Col>
         </Row>
