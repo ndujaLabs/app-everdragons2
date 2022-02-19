@@ -22,6 +22,17 @@ const config = {
     "Matic Network": 137,
   },
   supportedId: {
+    1: {
+      chainId: "0x1",
+      chainName: "Ethereum",
+      nativeCurrency: {
+        name: "ETH",
+        symbol: "ETH",
+        decimals: 18,
+      },
+      rpcUrls: [""],
+      blockExplorerUrls: [""],
+    },
     137: {
       chainId: "0x" + Number(137).toString(16),
       chainName: "Polygon PoS (ex-Matic)",
@@ -59,7 +70,8 @@ const config = {
           blockExplorerUrls: [],
         }
       : undefined,
-    42: {
+    42: isDev
+      ? {
       chainId: "0x" + Number(42).toString(16),
       chainName: "Kovan",
       nativeCurrency: {
@@ -69,7 +81,7 @@ const config = {
       },
       rpcUrls: ["https://kovan.etherscan.io"],
       blockExplorerUrls: [],
-    },
+    } : undefined,
   },
   openSeaLink: {
     80001:
