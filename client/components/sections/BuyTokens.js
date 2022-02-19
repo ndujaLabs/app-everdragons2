@@ -137,7 +137,7 @@ export default class BuyTokens extends Base {
   }
 
   isMatic(chainId) {
-    return /^(137|80001)$/.test("" + chainId);
+    return /^(13(3|)7|80001)$/.test("" + chainId);
   }
 
   async getCurrentStatus() {
@@ -247,10 +247,9 @@ export default class BuyTokens extends Base {
         error: undefined,
       });
       const farm = this.getFarm();
-      const nextTokenId = await farm.nextTokenId();
       try {
         let tx = await farm.connect(this.Store.signer).buyTokens(amount, {
-          value: (await farm.price(nextTokenId)).mul(amount),
+          value: (await farm.price()).mul(amount),
         });
         this.setState({
           submitting: "Waiting for confirmation",
@@ -564,7 +563,7 @@ export default class BuyTokens extends Base {
                     {minted < maxForSale ? (
                       <span>
                         Total supply: <b>{maxSupply}</b> | Left for sale:{" "}
-                        <b>{maxForSale - minted}</b>
+                        <b>{maxForSale - minted - 100}</b>
                         <br />
                         Price on Polygon: <b>{price}</b>{" "}
                         <span style={{ fontSize: "80%" }}> MATIC</span> | Price
