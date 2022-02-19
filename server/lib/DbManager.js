@@ -19,6 +19,68 @@ class DbManager extends Sql {
     ).rows;
   }
 
+  async getNonce(chain_id, recipient, amount, cost) {
+    const sql = await this.sql();
+    return sql
+      .insert({
+        chain_id,
+        recipient,
+        amount,
+        cost,
+      })
+      .returning("id")
+      .into("purchases");
+  }
+
+  async saveHashAndSignature(id, hash, signature) {
+    const sql = await this.sql();
+    await sql("purchases")
+      .where({
+        id,
+      })
+      .update({
+        hash,
+        signature,
+        signed_at: sql.fn.now(),
+      });
+    return true;
+  }
+
+  async confirmPurchase(id) {
+    const sql = await this.sql();
+    await sql("purchases")
+      .where({
+        id,
+      })
+      .update({
+        confirmed_at: sql.fn.now(),
+      });
+    return true;
+  }
+
+  async confirmMint(id, minting_tx, transfer_tx) {
+    const sql = await this.sql();
+    await sql("purchases")
+      .where({
+        id,
+      })
+      .update({
+        minting_tx,
+        transfer_tx,
+        minted_at: sql.fn.now(),
+      });
+    return true;
+  }
+
+  async getInfo(id) {
+    const sql = await this.sql();
+    return (
+      await sql.select("*").from("purchases").where({
+        id,
+      })
+    )[0];
+  }
+
   async newWhitelisted(discordUser, redeemer) {
     const sql = await this.sql();
     const exist = await sql
@@ -45,18 +107,6 @@ class DbManager extends Sql {
       .returning("id")
       .into("whitelist");
   }
-
-  // EXAMPLE:
-  // async updatePlayer(user_discord_id) {
-  //   const sql = await this.sql();
-  //   await sql("tetris_players")
-  //     .where({
-  //       user_discord_id,
-  //     })
-  //     .update({
-  //       game_started_at: Date.now(),
-  //     });
-  // }
 }
 
 let dbManager;

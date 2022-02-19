@@ -59,6 +59,17 @@ const config = {
           blockExplorerUrls: [],
         }
       : undefined,
+    42: {
+      chainId: "0x" + Number(42).toString(16),
+      chainName: "Kovan",
+      nativeCurrency: {
+        name: "ETH",
+        symbol: "ETH",
+        decimals: 18,
+      },
+      rpcUrls: ["https://kovan.etherscan.io"],
+      blockExplorerUrls: [],
+    },
   },
   openSeaLink: {
     80001:

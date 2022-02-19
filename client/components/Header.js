@@ -141,7 +141,7 @@ export default class Header extends Base {
                   to="howToBuy"
                   onClick={this.setExpanded}
                 >
-                  How to buy MATIC
+                  How to get <span style={{ fontSize: "80%" }}>MATIC</span>
                 </Scroll.Link>
               </Nav>
             )

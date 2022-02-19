@@ -25,6 +25,19 @@ class Base extends Common {
     }
   }
 
+  async waitForWeb3() {
+    while (!this.Store.connectedWallet && !this.Store.notConnected) {
+      await this.sleep(100);
+    }
+  }
+
+  async waitForContracts() {
+    await this.waitForWeb3();
+    while (!this.Store.contracts) {
+      await this.sleep(100);
+    }
+  }
+
   isMobile() {
     return window.innerWidth < 990;
   }

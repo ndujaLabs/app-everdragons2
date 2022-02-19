@@ -929,7 +929,7 @@ input::placeholder {
 
 .underProgress {
     font-size: 1.4rem;
-    padding: 6px 0 24px;
+    padding: 6px 0;
 }
 
 .trade {
@@ -972,7 +972,20 @@ input::placeholder {
 
 .h2smaller {
     font-size: 1.5rem;
+    /*font-weight: bold;*/
+}
+
+.h2smaller div {
     font-weight: bold;
+}
+
+.hilite {
+    padding: 18px 8px;
+    background-color: #ddff8890;
+    border-radius: 12px;
+    border: 2px solid white;
+    /*font-family: "Roboto" !important;*/
+    font-size: 0.9rem;
 }
 
 .sneakpeak {
@@ -1004,4 +1017,20 @@ input::placeholder {
     100% {
         opacity: 0.5;
     }
+}
+
+.starred {
+    font-size: 0.7rem;
+}
+
+.legenda {
+    font-family: "Hina Mincho", serif;
+    font-size: 1.6rem;
+}
+
+.underLegenda {
+    font-weight: bold;
+    font-size: 1.2rem;
+    padding: 20px 0 0;
+    margin-bottom: -12px;
 }

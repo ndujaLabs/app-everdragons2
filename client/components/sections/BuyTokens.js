@@ -10,7 +10,6 @@ import Address from "../../utils/Address";
 import Ab from "../Ab";
 import { openSeaLink, contracts } from "../../config";
 import { switchTo } from "../../utils/networkUtils";
-import { expect } from "chai";
 
 export default class BuyTokens extends Base {
   constructor(props) {
@@ -20,7 +19,7 @@ export default class BuyTokens extends Base {
       amount2: 0,
       errors: {},
       total: 0,
-      price: "",
+      price: "100",
       minted: 0,
       balance: 0,
       address: "",
@@ -29,7 +28,10 @@ export default class BuyTokens extends Base {
       progress: 0,
       isOwner: false,
       checked: false,
-      maticBalance: 0,
+      walletBalance: 0,
+      ethPrice: 0,
+      progress2: 0,
+      remaining: 650,
     };
 
     this.bindMany([
@@ -43,11 +45,13 @@ export default class BuyTokens extends Base {
       "showHowToAdd",
       "getFarm",
       "distribute",
+      "buyInEth",
+      "getCurrentStatus",
     ]);
   }
 
   componentDidMount() {
-    this.getValues();
+    this.getCurrentStatus();
   }
 
   checkAmount(name, value) {
@@ -57,6 +61,9 @@ export default class BuyTokens extends Base {
       submitting: undefined,
       error: undefined,
     };
+    const price = this.isMatic(this.Store.chainId)
+      ? this.state.price
+      : this.getEtherPrice();
     if (name === "amount") {
       value = parseInt(value || "0");
       if (isNaN(value)) {
@@ -64,14 +71,12 @@ export default class BuyTokens extends Base {
       } else if (value > 10) {
         state.errors.amount = "You cannot buy more than 10 tokens at once";
       } else if (
-        parseFloat(this.state.maticBalance) <
-        value * parseFloat(this.state.price)
+        parseFloat(this.state.walletBalance) <
+        value * parseFloat(price)
       ) {
         state.errors.amount = "Insufficient funds";
       } else {
-        state.total = parseFloat(
-          (parseFloat(this.state.price) * value).toString().substring(0, 5)
-        );
+        state.total = parseFloat((price * value).toString());
       }
     }
     state[name] = value;
@@ -105,6 +110,7 @@ export default class BuyTokens extends Base {
       ),
     });
   }
+
   copyToClipboard(chainId) {
     const address = contracts[chainId].Everdragons2Genesis;
     try {
@@ -125,27 +131,61 @@ export default class BuyTokens extends Base {
     this.checkAmount(name, value);
   }
 
-  async getValues() {
-    const { Everdragons2Genesis } = this.Store.contracts;
-    const farm = this.getFarm();
-    const maxForSale = (await farm.maxForSale()).toNumber();
-    const maxClaimable = (await farm.maxClaimable()).toNumber();
-    const maxSupply = maxForSale + maxClaimable;
-    if (farm.address !== ethers.constants.AddressZero) {
-      let maticBalance = await this.Store.provider.getBalance(
-        this.Store.connectedWallet
-      );
-      let tmp = ethers.utils.formatEther(maticBalance.toString()).split(".");
-      if (tmp[1]) {
-        tmp[1] = tmp[1].substring(0, 2);
+  getEtherPrice(lastId) {
+    // price on Ethereum is 0.06, when Matic is 100
+    return 0.06;
+  }
+
+  isMatic(chainId) {
+    return /^(137|80001)$/.test("" + chainId);
+  }
+
+  async getCurrentStatus() {
+    await this.waitForWeb3();
+    const { chainId } = this.Store;
+    if (!this.isMatic(chainId)) {
+      const res = await this.request("/get-current-status", "get", undefined, {
+        chainId,
+      });
+      if (res.success) {
+        this.setStore({
+          currentTotalSupply: res.totalSupply,
+        });
       }
-      maticBalance = tmp[1] ? tmp.join(".") : tmp[0];
-      const price =
-        this.state.price || ethers.utils.formatEther(await farm.price());
+    }
+    this.getValues();
+  }
+
+  async getValues() {
+    let walletBalance = await this.Store.provider.getBalance(
+      this.Store.connectedWallet
+    );
+    let tmp = ethers.utils.formatEther(walletBalance.toString()).split(".");
+    if (tmp[1]) {
+      tmp[1] = tmp[1].substring(0, 2);
+    }
+    walletBalance = tmp[1] ? tmp.join(".") : tmp[0];
+    const maxForSale = 650;
+    const maxClaimable = 350;
+    const maxSupply = 1000;
+    let progress2 = 0;
+    let reserved = 350;
+    if (this.isMatic(this.Store.chainId)) {
+      const { Everdragons2Genesis } = this.Store.contracts;
+      const farm = this.getFarm();
       const nextTokenId = (await farm.nextTokenId()).toNumber();
+      const price = ethers.utils.formatEther(await farm.price());
+      const ethPrice = this.getEtherPrice();
       const minted = nextTokenId - 351;
-      const progress = Math.ceil((minted * 100) / maxSupply);
-      const base = Math.ceil((350 * 100) / maxSupply);
+      const base = maxClaimable / 10;
+      let closed = await farm.saleClosedAt();
+      if (closed !== 0) {
+        reserved += 1000 - closed;
+        progress2 = (maxSupply - closed) / 10;
+      }
+      const progress = Math.round(minted / 10);
+      const remaining = 100 - progress - base - progress2;
+
       const balance = (
         await Everdragons2Genesis.balanceOf(this.Store.connectedWallet)
       ).toNumber();
@@ -159,19 +199,44 @@ export default class BuyTokens extends Base {
         base,
         progress,
         balance,
+        nextTokenId,
         isOwner,
         maxSupply,
         maxForSale,
         maxClaimable,
         checked: true,
-        maticBalance,
+        walletBalance,
+        progress2,
+        ethPrice,
+        reserved,
+        remaining,
       });
     } else {
+      const minted = this.Store.currentTotalSupply || 0;
+      const nextTokenId = minted + 350;
+      const ethPrice = this.getEtherPrice();
+      const base = maxClaimable / 10;
+      progress2 = this.Store.chainId === 1 ? 10 : 5;
+      reserved = this.Store.chainId === 1 ? 450 : 400;
+      const progress = Math.round(minted / 10);
+      const remaining = 100 - progress - base - progress2;
       this.setState({
+        minted,
+        base,
+        progress,
+        maxSupply,
+        maxForSale,
+        maxClaimable,
+        nextTokenId,
         checked: true,
+        reserved,
+        walletBalance,
+        progress2,
+        remaining,
+        ethPrice,
       });
     }
-    this.setTimeout(this.getValues, 30000);
+    this.setTimeout(this.getValues, 10000);
   }
 
   async buy() {
@@ -182,9 +247,10 @@ export default class BuyTokens extends Base {
         error: undefined,
       });
       const farm = this.getFarm();
+      const nextTokenId = await farm.nextTokenId();
       try {
         let tx = await farm.connect(this.Store.signer).buyTokens(amount, {
-          value: (await farm.price()).mul(amount),
+          value: (await farm.price(nextTokenId)).mul(amount),
         });
         this.setState({
           submitting: "Waiting for confirmation",
@@ -209,11 +275,84 @@ export default class BuyTokens extends Base {
     }
   }
 
+  async buyInEth() {
+    const amount = this.state.amount;
+    if (amount > 0 && amount <= 10) {
+      this.setState({
+        submitting: "Waiting for validation",
+        error: undefined,
+        amountTaken: 0,
+      });
+      let res = await this.request("authorize-purchase", "post", {
+        amount,
+      });
+      if (!res.success) {
+        return this.setState({
+          error: "Transaction not authorized",
+          submitting: undefined,
+        });
+      }
+      let { nonce, cost, signature } = res;
+      cost = ethers.BigNumber.from(cost);
+      this.setState({
+        submitting: "Waiting for approval",
+        error: undefined,
+      });
+      const farm = this.Store.contracts.EthereumFarm;
+      try {
+        let tx = await farm
+          .connect(this.Store.signer)
+          .buyTokenCrossChain(amount, nonce, cost, signature, {
+            value: cost,
+          });
+        this.setState({
+          submitting: (
+            <span>
+              Waiting to confirm the transaction.
+              <br />
+              Please do not leave/refresh the page
+            </span>
+          ),
+        });
+        await tx.wait();
+        this.setState({
+          submitting: (
+            <span>
+              Waiting for minting.
+              <br />
+              Please do not leave/refresh the page
+            </span>
+          ),
+        });
+        res = await this.request("mint-token", "post", {
+          nonce,
+        });
+        const { mintingTx } = res;
+        if (!mintingTx) {
+          return this.setState({
+            error: "Purchase not found. Contact info@ndujalabs.com for support",
+            submitting: undefined,
+          });
+        }
+        this.setState({
+          congratulations: true,
+          submitting: undefined,
+          mintingTx,
+          amountTaken: amount,
+        });
+      } catch (e) {
+        this.setState({
+          error: decodeMetamaskError(e.message),
+          submitting: undefined,
+        });
+      }
+    } else {
+      this.setState({ error: "Invalid amount", submitting: undefined });
+    }
+  }
+
   getFarm() {
-    // return this.Store.chainId === 137
-    //   ? this.Store.contracts.GenesisFarm
-    //   :
-    return this.Store.contracts.GenesisFarm2;
+    return this.Store.contracts.GenesisFarm3;
   }
 
   async withdraw() {
@@ -257,18 +396,28 @@ export default class BuyTokens extends Base {
       submitting,
       total,
       price,
-      isOwner,
+      // isOwner,
       base,
       progress,
+      progress2,
       error,
       minted,
       balance,
       checked,
-      maticBalance,
+      walletBalance,
       maxSupply,
       maxForSale,
-      maxClaimable,
+      mintingTx,
+      amountTaken,
+      ethPrice,
+      remaining,
+      reserved,
     } = this.state;
+
+    console.log("price", price);
+
+    const currency = this.isMatic(this.Store.chainId) ? "MATIC" : "ETH";
+    const buyFunc = this.isMatic(this.Store.chainId) ? this.buy : this.buyInEth;
 
     const { chainId } = this.Store;
 
@@ -284,66 +433,155 @@ export default class BuyTokens extends Base {
 
     return (
       <div>
-        {chainId === 80001 ? (
-          <Row>
-            <Col lg={2} />
-            <Col lg={8}>
-              <div className={"alert centered"}>
-                YOU ARE USING THE TEST APP ON MUMBAI.
-                <br />
+        {/*{chainId === 80001 ? (*/}
+        {/*  <Row>*/}
+        {/*    <Col lg={2} />*/}
+        {/*    <Col lg={8}>*/}
+        {/*      <div className={"alert centered"}>*/}
+        {/*        YOU ARE USING THE TEST APP ON MUMBAI.*/}
+        {/*        <br />*/}
+        {/*        <Ab*/}
+        {/*          label={"Click here to switch to Polygon PoS"}*/}
+        {/*          onClick={() => switchTo(137)}*/}
+        {/*        />*/}
+        {/*      </div>*/}
+        {/*    </Col>*/}
+        {/*    <Col lg={2} />*/}
+        {/*  </Row>*/}
+        {/*) : null}*/}
+        <Row>
+          <Col>
+            <div className={"legenda centered"}>
+              E2GT are ERC721 tokens on the Polygon PoS Network.
+            </div>
+            <div className={"roboto centered underLegenda"}>
+              You can get them in two ways:
+            </div>
+          </Col>
+        </Row>
+        <Row>
+          <Col lg={2} />
+          <Col lg={4}>
+            <div className={"centered mt24 h2smaller hilite"}>
+              <div style={{ fontSize: "120%" }}>On Polygon</div>
+              The best option. You pay with MATIC on Polygon PoS. The gas cost
+              is negligible and the transaction is fast and smooth.
+              <br />
+              {this.isMatic(chainId) ? (
+                <div>Use the font below to proceed</div>
+              ) : (
                 <Ab
-                  label={"Click here to switch to Polygon PoS"}
+                  label={"Click here to switch/configure it"}
                   onClick={() => switchTo(137)}
+                  style={{ fontWeight: "normal" }}
                 />
-              </div>
-            </Col>
-            <Col lg={2} />
-          </Row>
-        ) : null}
+              )}
+            </div>
+          </Col>
+          <Col lg={4}>
+            <div className={"centered mt24 h2smaller hilite"}>
+              <div style={{ fontSize: "120%" }}>On Ethereum</div>
+              You pay with ETH but receive the tokens on Polygon PoS. Since the
+              minting happens on Polygon, the gas cost is quite low.
+              <br />
+              {this.isMatic(chainId) ? (
+                <Ab
+                  label={"Click here to switch/configure it"}
+                  onClick={() => switchTo(1)}
+                  style={{ fontWeight: "normal" }}
+                />
+              ) : (
+                <div>Use the form below to proceed</div>
+              )}
+            </div>
+          </Col>
+          <Col lg={2} />
+        </Row>
         <Row>
           <Col lg={2} />
           <Col lg={8}>
             <div className={"mt24 likeh2"}>
-              Get Everdragons2 Genesis Tokens eggs
-              <div className={"smallUnder"}>
-                <Ab
-                  label={"Add the token to your wallet"}
-                  onClick={this.showHowToAdd}
-                />
-              </div>
+              Get Everdragons2 Genesis Tokens
+              {this.isMatic(this.Store.chainId) ? (
+                <div className={"smallUnder"}>
+                  <Ab
+                    label={"Add the token to your wallet"}
+                    onClick={this.showHowToAdd}
+                  />
+                </div>
+              ) : null}
             </div>
             <div className={"padded"}>
               <ProgressBar>
                 <ProgressBar
                   variant="warning"
-                  now={base + progress}
-                  key={2}
+                  now={base + progress2}
+                  key={0}
+                  style={{
+                    textShadow: "0 0 3px white",
+                    backgroundImage:
+                      "linear-gradient(lightgreen, mediumspringgreen)",
+                    color: "black",
+                    fontWeight: "bold",
+                  }}
+                  label={`${reserved} reserved*`}
+                />
+                <ProgressBar
+                  variant="warning"
+                  now={progress}
+                  key={1}
                   style={{
                     textShadow: "0 0 3px white",
                     backgroundImage: "linear-gradient(orange, gold)",
                     color: "black",
                     fontWeight: "bold",
                   }}
-                  // label={`350 assigned, ${minted} sold`}
+                  label={`${minted} sold`}
                 />
                 <ProgressBar
                   striped
                   variant="success"
-                  now={100 - base - progress}
-                  key={1}
+                  now={remaining}
+                  key={2}
                 />
+                {/*{progress2 ? (*/}
+                {/*  <ProgressBar*/}
+                {/*    now={progress2}*/}
+                {/*    key={3}*/}
+                {/*    style={{*/}
+                {/*      textShadow: "0 0 3px white",*/}
+                {/*      backgroundImage:*/}
+                {/*        "linear-gradient(lightgreen, mediumspringgreen)",*/}
+                {/*      color: "black",*/}
+                {/*      fontWeight: "bold",*/}
+                {/*    }}*/}
+                {/*  />*/}
+                {/*) : null}*/}
               </ProgressBar>
               {price ? (
-                <div className={"underProgress centered"}>
-                  {minted < maxForSale ? (
-                    <span>
-                      Total supply: <b>{maxSupply}</b> | Left for sale:{" "}
-                      <b>{maxForSale - minted}</b> | Price: <b>{price}</b>
-                      <span style={{ fontSize: "80%" }}> MATIC</span>
-                    </span>
-                  ) : (
-                    "Sold out."
-                  )}
+                <div>
+                  <div className={"underProgress centered"}>
+                    {minted < maxForSale ? (
+                      <span>
+                        Total supply: <b>{maxSupply}</b> | Left for sale:{" "}
+                        <b>{maxForSale - minted}</b>
+                        <br />
+                        Price on Polygon: <b>{price}</b>{" "}
+                        <span style={{ fontSize: "80%" }}> MATIC</span> | Price
+                        on Ethereum: <b>{ethPrice}</b>{" "}
+                        <span style={{ fontSize: "80%" }}> ETH</span>
+                      </span>
+                    ) : (
+                      "Sold out."
+                    )}
+                  </div>
+                  <div className={"starred centered"}>
+                    * 350 tokens have been won by community members in the
+                    Goldmine game, the ARG contests, and a few giveaways.
+                    <br />
+                    {reserved - 350} tokens are kept in the treasury wallet to
+                    be used for future giveaways, sales and other actions.
+                  </div>
                 </div>
               ) : null}
             </div>
@@ -356,6 +594,31 @@ export default class BuyTokens extends Base {
             <Col lg={8}>
               <div className={"centered padded"}>
                 <Loading />
+              </div>
+            </Col>
+            <Col lg={2} />
+          </Row>
+        ) : amountTaken ? (
+          <Row>
+            <Col lg={2} />
+            <Col lg={8}>
+              <div
+                className={"textBlock centered"}
+                style={{ padding: 16, backgroundColor: "#cf9" }}
+              >
+                Congratulations, you get {amountTaken} E2GT
+                <div className={"trade"}>
+                  You can check the minting transaction{" "}
+                  <Ab
+                    link={`https://${
+                      chainId === 42 ? "mumbai." : ""
+                    }polygonscan.com/tx/${mintingTx}`}
+                    label={"here"}
+                  />
+                  .<br />
+                  We also sent you 1{" "}
+                  <span style={{ fontSize: "80%" }}>MATIC</span>. Enjoy it :)
+                </div>
               </div>
             </Col>
             <Col lg={2} />
@@ -393,7 +656,10 @@ export default class BuyTokens extends Base {
                 divCls={"shortInput floatRight"}
               />
               {total > 0 ? (
-                <div style={{ clear: "both" }}>Total price {total} MATIC</div>
+                <div style={{ clear: "both" }}>
+                  Total price {total}{" "}
+                  <span style={{ fontSize: "80%" }}>{currency}</span>
+                </div>
               ) : null}
             </Col>
             <Col className={"mt4"}>
@@ -418,14 +684,15 @@ export default class BuyTokens extends Base {
                   <Button
                     size={"lg"}
                     disabled={submitting}
-                    onClick={this.buy}
+                    onClick={buyFunc}
                     className={"shortInput"}
                     variant={"success"}
                   >
                     Buy now!
                   </Button>
                   <div className={"balance"}>
-                    Your MATIC balance: <b>{maticBalance}</b>
+                    Your balance: <b>{walletBalance}</b>{" "}
+                    <span style={{ fontSize: "80%" }}>{currency}</span>
                   </div>
                 </div>
               )}
@@ -439,7 +706,180 @@ export default class BuyTokens extends Base {
             </Col>
           </Row>
         ) : null}
+        {/*<Row>*/}
+        {/*  <Col lg={2} />*/}
+        {/*  <Col lg={8}>*/}
+        {/*    <h2 style={{ marginTop: 32 }}>*/}
+        {/*      Price evolution in <span style={{ fontSize: "80%" }}>MATIC</span>{" "}*/}
+        {/*      by tokenId*/}
+        {/*    </h2>*/}
+        {/*    <div className={"padded"}>*/}
+        {/*      <ProgressBar>*/}
+        {/*        <ProgressBar*/}
+        {/*          variant="warning"*/}
+        {/*          now={35}*/}
+        {/*          key={2}*/}
+        {/*          style={{*/}
+        {/*            textShadow: "0 0 3px white",*/}
+        {/*            backgroundImage:*/}
+        {/*              "linear-gradient(lightgreen, mediumspringgreen)",*/}
+        {/*            color: "black",*/}
+        {/*            fontWeight: "bold",*/}
+        {/*          }}*/}
+        {/*          label={"0"}*/}
+        {/*        />*/}
 
+        {/*        <ProgressBar*/}
+        {/*          variant="warning"*/}
+        {/*          now={25}*/}
+        {/*          key={2}*/}
+        {/*          style={{*/}
+        {/*            textShadow: "0 0 3px white",*/}
+        {/*            backgroundImage: "linear-gradient(yellow, gold)",*/}
+        {/*            color: "black",*/}
+        {/*            fontWeight: "bold",*/}
+        {/*          }}*/}
+        {/*          label={"100"}*/}
+        {/*        />*/}
+
+        {/*        <ProgressBar*/}
+        {/*          variant="warning"*/}
+        {/*          now={10}*/}
+        {/*          key={2}*/}
+        {/*          style={{*/}
+        {/*            textShadow: "0 0 3px white",*/}
+        {/*            backgroundImage: "linear-gradient(gold, orange)",*/}
+        {/*            color: "black",*/}
+        {/*            fontWeight: "bold",*/}
+        {/*          }}*/}
+        {/*          label={"200"}*/}
+        {/*        />*/}
+
+        {/*        <ProgressBar*/}
+        {/*          variant="warning"*/}
+        {/*          now={10}*/}
+        {/*          key={2}*/}
+        {/*          style={{*/}
+        {/*            textShadow: "0 0 3px white",*/}
+        {/*            backgroundImage: "linear-gradient(orange, crimson)",*/}
+        {/*            color: "black",*/}
+        {/*            fontWeight: "bold",*/}
+        {/*          }}*/}
+        {/*          label={"300"}*/}
+        {/*        />*/}
+
+        {/*        <ProgressBar*/}
+        {/*          variant="warning"*/}
+        {/*          now={10}*/}
+        {/*          key={2}*/}
+        {/*          style={{*/}
+        {/*            textShadow: "0 0 3px white",*/}
+        {/*            backgroundImage: "linear-gradient(crimson, brown)",*/}
+        {/*            color: "black",*/}
+        {/*            fontWeight: "bold",*/}
+        {/*          }}*/}
+        {/*          label={"400"}*/}
+        {/*        />*/}
+
+        {/*        <ProgressBar*/}
+        {/*          variant="warning"*/}
+        {/*          now={10}*/}
+        {/*          key={2}*/}
+        {/*          style={{*/}
+        {/*            textShadow: "0 0 3px white",*/}
+        {/*            backgroundImage: "linear-gradient(crimson, red)",*/}
+        {/*            color: "black",*/}
+        {/*            fontWeight: "bold",*/}
+        {/*          }}*/}
+        {/*          label={"500"}*/}
+        {/*        />*/}
+        {/*      </ProgressBar>*/}
+        {/*      /!*</div>*!/*/}
+
+        {/*      /!*<div className={"padded"}>*!/*/}
+        {/*      <ProgressBar>*/}
+        {/*        <ProgressBar*/}
+        {/*          variant="warning"*/}
+        {/*          now={35}*/}
+        {/*          key={2}*/}
+        {/*          style={{*/}
+        {/*            textShadow: "0 0 3px white",*/}
+        {/*            backgroundImage: "linear-gradient(#f0f0f0, #e0e0e0)",*/}
+        {/*            color: "black",*/}
+        {/*            fontWeight: "bold",*/}
+        {/*          }}*/}
+        {/*          label={"0-350"}*/}
+        {/*        />*/}
+
+        {/*        <ProgressBar*/}
+        {/*          variant="warning"*/}
+        {/*          now={25}*/}
+        {/*          key={2}*/}
+        {/*          style={{*/}
+        {/*            textShadow: "0 0 3px white",*/}
+        {/*            backgroundImage: "linear-gradient(#e8e8e8, #d8d8d8)",*/}
+        {/*            color: "black",*/}
+        {/*            fontWeight: "bold",*/}
+        {/*          }}*/}
+        {/*          label={"351-600"}*/}
+        {/*        />*/}
+
+        {/*        <ProgressBar*/}
+        {/*          variant="warning"*/}
+        {/*          now={10}*/}
+        {/*          key={2}*/}
+        {/*          style={{*/}
+        {/*            textShadow: "0 0 3px white",*/}
+        {/*            backgroundImage: "linear-gradient(#e0e0e0, #d0d0d0)",*/}
+        {/*            color: "black",*/}
+        {/*            fontWeight: "bold",*/}
+        {/*          }}*/}
+        {/*          label={"601-700"}*/}
+        {/*        />*/}
+
+        {/*        <ProgressBar*/}
+        {/*          variant="warning"*/}
+        {/*          now={10}*/}
+        {/*          key={2}*/}
+        {/*          style={{*/}
+        {/*            textShadow: "0 0 3px white",*/}
+        {/*            backgroundImage: "linear-gradient(#d8d8d8, #c0c0c0)",*/}
+        {/*            color: "black",*/}
+        {/*            fontWeight: "bold",*/}
+        {/*          }}*/}
+        {/*          label={"701-800"}*/}
+        {/*        />*/}
+
+        {/*        <ProgressBar*/}
+        {/*          variant="warning"*/}
+        {/*          now={10}*/}
+        {/*          key={2}*/}
+        {/*          style={{*/}
+        {/*            textShadow: "0 0 3px white",*/}
+        {/*            backgroundImage: "linear-gradient(#c8c8c8, #b8b8b8)",*/}
+        {/*            color: "black",*/}
+        {/*            fontWeight: "bold",*/}
+        {/*          }}*/}
+        {/*          label={"801-900"}*/}
+        {/*        />*/}
+
+        {/*        <ProgressBar*/}
+        {/*          variant="warning"*/}
+        {/*          now={10}*/}
+        {/*          key={2}*/}
+        {/*          style={{*/}
+        {/*            textShadow: "0 0 3px white",*/}
+        {/*            backgroundImage: "linear-gradient(#c0c0c0, #b0b0b0)",*/}
+        {/*            color: "black",*/}
+        {/*            fontWeight: "bold",*/}
+        {/*          }}*/}
+        {/*          label={"901-1000"}*/}
+        {/*        />*/}
+        {/*      </ProgressBar>*/}
+        {/*    </div>*/}
+        {/*  </Col>*/}
+        {/*  <Col lg={2} />*/}
+        {/*</Row>*/}
         {/*
         /// ADMIN
         */}
