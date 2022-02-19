@@ -16,7 +16,7 @@ async function getTotalSupply(chainId) {
   return (await Everdragons2Genesis.totalSupply()).toNumber();
 }
 
-function getEtherPrice(lastId) {
+function getEtherPrice() {
   return 0.06;
 }
 
@@ -32,11 +32,10 @@ router.get("/get-current-status", async (req, res) => {
 router.post("/authorize-purchase", async (req, res) => {
   const connectedWallet = req.get("Connected-wallet");
   const chainId = req.get("Chain-id");
-  const totalSupply = await getTotalSupply(chainId);
-  const nextTokenId = totalSupply + 350;
+  // const totalSupply = await getTotalSupply(chainId);
   const amount = parseInt(req.body.amount);
-  const price = getEtherPrice(nextTokenId);
-  const cost = ethers.utils.parseEther("" + price);
+  const price = getEtherPrice();
+  const cost = ethers.utils.parseEther("" + price * amount);
   const nonce = (
     await dbManager.getNonce(chainId, connectedWallet, amount, cost.toString())
   )[0];
