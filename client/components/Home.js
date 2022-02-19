@@ -1,4 +1,4 @@
-import BuyTokens from "./sections/BuyTokens";
+// import BuyTokens from "./sections/BuyTokens";
 
 // eslint-disable-next-line no-undef
 // const { Redirect } = ReactRouterDOM;
@@ -50,7 +50,8 @@ export default class Home extends Base {
         </MobileView>
         <BrowserView>
           {connectedWallet ? (
-            <BuyTokens Store={this.Store} setStore={this.setStore} />
+            // <BuyTokens Store={this.Store} setStore={this.setStore} />
+            <h2>Sale temporarily suspended for maintainance</h2>
           ) : (
             <Row>
               <Col>
