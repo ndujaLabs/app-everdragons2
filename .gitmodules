@@ -1,0 +1,3 @@
+[submodule "everdragons2-core"]
+	path = everdragons2-core
+	url = https://github.com/ndujaLabs/everdragons2-core.git
