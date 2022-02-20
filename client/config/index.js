@@ -2,7 +2,7 @@ let isDev;
 if (typeof window !== "undefined") {
   isDev =
     /localhost/.test(window.location.host) ||
-    /stage/.test(window.location.search);
+    /stage/.test(window.location.href);
 } else if (typeof process !== undefined && process.env) {
   isDev = true;
 }
