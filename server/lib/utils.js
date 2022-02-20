@@ -101,15 +101,16 @@ const utils = {
         : chainId === "80001"
         ? "mumbai"
         : "localhost";
-    let tx
+    let tx;
     try {
       tx = _.trim(
         execSync(
           `${scriptPath} ${chain} ${nonce} ${recipient} ${amount}`
         ).toString()
       );
-    } catch(e) {
-        throw new Error("Transaction not created");
+    } catch (e) {
+      console.error(e)
+      throw new Error("Transaction not created");
     }
     if (/^0x[a-f0-9]{64}/i.test(tx)) {
       dbManager.confirmMint(nonce, tx);
