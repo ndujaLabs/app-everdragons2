@@ -3,26 +3,25 @@ const router = express.Router();
 const ethers = require("ethers");
 const dbManager = require("../lib/DbManager");
 const {
-  getContracts,
+  getContract,
   signPackedData,
   getPackedHash,
-  getContract,
   mintTokenAndSendOneMatic,
+  getCrossChainId,
 } = require("../lib/utils");
 
 async function getTotalSupply(chainId) {
-  const contracts = getContracts(chainId !== "1");
-  const { Everdragons2Genesis } = contracts;
+  const Everdragons2Genesis = getContract(chainId, "Everdragons2Genesis");
   return (await Everdragons2Genesis.totalSupply()).toNumber();
 }
 
-function getEtherPrice() {
-  return 0.06;
+function getEtherPrice(chainId) {
+  return chainId === "1" ? 0.06 : 0.001;
 }
 
 router.get("/get-current-status", async (req, res) => {
-  const { chainId } = req.query;
-  const totalSupply = await getTotalSupply(chainId);
+  let { chainId } = req.query;
+  const totalSupply = await getTotalSupply(getCrossChainId(chainId));
   res.json({
     success: true,
     totalSupply,
@@ -34,7 +33,7 @@ router.post("/authorize-purchase", async (req, res) => {
   const chainId = req.get("Chain-id");
   // const totalSupply = await getTotalSupply(chainId);
   const amount = parseInt(req.body.amount);
-  const price = getEtherPrice();
+  const price = getEtherPrice(chainId);
   const cost = ethers.utils.parseEther("" + price * amount);
   const nonce = (
     await dbManager.getNonce(chainId, connectedWallet, amount, cost.toString())
@@ -74,20 +73,27 @@ router.post("/mint-token", async (req, res) => {
     });
   }
   const ethereumFarm = getContract(chainId, "EthereumFarm");
-
   const { buyer, quantity } = await ethereumFarm.purchasedTokens(nonce);
   await dbManager.confirmPurchase(nonce);
-  const mintingTx = await mintTokenAndSendOneMatic(
-    chainId === 1 ? 137 : 80001,
-    nonce,
-    buyer,
-    quantity
-  );
+  try {
+    const mintingTx = await mintTokenAndSendOneMatic(
+      chainId,
+      nonce,
+      buyer,
+      quantity
+    );
 
-  return res.json({
-    success: true,
-    mintingTx,
-  });
+    return res.json({
+      success: true,
+      mintingTx,
+    });
+  } catch (e) {
+    console.error(e);
+    res.json({
+      success: false,
+      error: e.message,
+    });
+  }
 });
 
 module.exports = router;

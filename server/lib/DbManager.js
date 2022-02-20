@@ -58,7 +58,7 @@ class DbManager extends Sql {
     return true;
   }
 
-  async confirmMint(id, minting_tx, transfer_tx) {
+  async confirmMint(id, minting_tx) {
     const sql = await this.sql();
     await sql("purchases")
       .where({
@@ -66,7 +66,6 @@ class DbManager extends Sql {
       })
       .update({
         minting_tx,
-        transfer_tx,
         minted_at: sql.fn.now(),
       });
     return true;

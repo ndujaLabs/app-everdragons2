@@ -2,7 +2,7 @@ let isDev;
 if (typeof window !== "undefined") {
   isDev = /localhost/.test(window.location.host);
 } else if (typeof process !== undefined && process.env) {
-  isDev = process.env.NODE_ENV === "development";
+  isDev = true;
 }
 
 const contracts = Object.assign(

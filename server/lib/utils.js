@@ -1,11 +1,25 @@
 const ethers = require("ethers");
 const { Contract } = require("@ethersproject/contracts");
 const config = require("../../client/config");
-// const _ = require("lodash");
-const { infuraApiKey, validator } = require("../../env.json");
+const { execSync } = require("child_process");
+const path = require("path");
+const _ = require("lodash");
+const {
+  infuraApiKey,
+  validator,
+  // maticvigilKey
+} = require("../../env.json");
+
 const dbManager = require("./DbManager");
 // cache:
 const contracts = {};
+
+// class FastProvider extends ethers.providers.InfuraProvider {
+//   async getGasPrice() {
+//     const gasPrice = await super.getGasPrice();
+//     return gasPrice.add(gasPrice.div(5));
+//   }
+// }
 
 const utils = {
   sleep: async (millis) => {
@@ -13,21 +27,25 @@ const utils = {
     return new Promise((resolve) => setTimeout(resolve, millis));
   },
 
-  getContracts(testnet) {
-    let provider = new ethers.providers.InfuraProvider(
-      testnet ? "maticmum" : "matic",
-      infuraApiKey
-    );
-    let contracts = {};
-    let addresses = config.contracts[testnet ? 80001 : 137];
-    for (let contractName in addresses) {
-      contracts[contractName] = new Contract(
-        addresses[contractName],
-        config.abi[contractName],
-        provider
-      );
+  getProvider(chainId) {
+    chainId = chainId.toString();
+    let provider;
+    if (chainId === "1337") {
+      provider = new ethers.providers.JsonRpcProvider();
+      // } else if (chainId === "137") {
+      //   provider = new ethers.providers.AlchemyProvider("matic", alchemyKey);
+    } else {
+      const network =
+        chainId === "42"
+          ? "kovan"
+          : chainId === "137"
+          ? "matic"
+          : chainId === "80001"
+          ? "maticmum"
+          : "homestead";
+      provider = new ethers.providers.InfuraProvider(network, infuraApiKey);
     }
-    return contracts;
+    return provider;
   },
 
   getContract(chainId, contractName) {
@@ -37,27 +55,10 @@ const utils = {
         contracts[chainId] = {};
       }
       if (!contracts[chainId][contractName]) {
-        let provider;
-        if (chainId === "1337") {
-          provider = new ethers.providers.JsonRpcProvider();
-        } else {
-          const network =
-            chainId === "42"
-              ? "kovan"
-              : chainId === "137"
-              ? "matic"
-              : chainId === "80001"
-              ? "maticmum"
-              : "homestead";
-          provider = new ethers.providers.InfuraProvider(
-            network,
-            process.env.INFURA_API_KEY
-          );
-        }
         contracts[chainId][contractName] = new Contract(
           config.contracts[chainId][contractName],
           config.abi[contractName],
-          provider
+          utils.getProvider(chainId)
         );
       }
       return contracts[chainId][contractName];
@@ -72,29 +73,56 @@ const utils = {
     return ethers.utils.joinSignature(signedDigest);
   },
 
-  async mintTokenAndSendOneMatic(chainId, nonce, recipient, amount) {
-    const farm = utils.getContract(chainId, "GenesisFarm3");
-    const provider = new ethers.providers.InfuraProvider(
-      chainId === "1" ? "matic" : "maticmum",
-      infuraApiKey
-    );
-    const wallet = new ethers.Wallet(validator, provider);
-    const tx = await farm
-      .connect(wallet)
-      .deliverCrossChainPurchase(nonce, recipient, amount, {
-        gasLimit: (80 + 140 * amount) * 1000,
-      });
-    utils.giveAway1Matic(tx, nonce, wallet, recipient);
-    return tx.hash;
+  getCrossChainId(chainId) {
+    chainId = chainId.toString();
+    return chainId.toString() === "1"
+      ? "137"
+      : chainId.toString() === "42"
+      ? "80001"
+      : chainId;
   },
 
-  async giveAway1Matic(tx, nonce, wallet, recipient) {
-    await tx.wait();
+  async mintTokenAndSendOneMatic(chainId, nonce, recipient, amount) {
+    chainId = utils.getCrossChainId(chainId);
+    const farm = utils.getContract(chainId, "GenesisFarm3");
+    if (await farm.usedNonces(nonce)) {
+      throw new Error("Tokens already minted");
+    }
+    const nextTokenId = (await farm.nextTokenId()).toNumber();
+    const maxTokenId = (await farm.maxTokenId()).toNumber();
+    if (nextTokenId + amount - 1 > maxTokenId) {
+      throw new Error("Not enough tokens left :-(");
+    }
+
+    const scriptPath = path.resolve(__dirname, "../../send-tokens.sh");
+    const chain =
+      chainId === "137"
+        ? "matic"
+        : chainId === "80001"
+        ? "mumbai"
+        : "localhost";
+    const tx = _.trim(
+      execSync(
+        `${scriptPath} ${chain} ${nonce} ${recipient} ${amount}`
+      ).toString()
+    );
+    if (/^0x[a-f0-9]{64}/i.test(tx)) {
+      dbManager.confirmMint(nonce, tx);
+      return tx;
+    } else {
+      throw new Error("Transaction failed");
+    }
+  },
+
+  async giveAway1Matic(tx, nonce, wallet, recipient, amount) {
+    // await tx.wait();
     const transfer = await wallet.sendTransaction({
       to: recipient,
-      value: ethers.utils.parseEther("0.1"),
+      value: ethers.utils.parseEther(amount),
     });
+    // await transfer.wait();
     dbManager.confirmMint(nonce, tx.hash, transfer.hash);
+    console.debug("all done");
   },
 
   async getPackedHash(chainId, recipient, amount, nonce, cost) {

@@ -47,6 +47,7 @@ export default class BuyTokens extends Base {
       "distribute",
       "buyInEth",
       "getCurrentStatus",
+      "getEtherPrice",
     ]);
   }
 
@@ -131,13 +132,14 @@ export default class BuyTokens extends Base {
     this.checkAmount(name, value);
   }
 
-  getEtherPrice(lastId) {
+  getEtherPrice() {
+    const { chainId } = this.Store;
     // price on Ethereum is 0.06, when Matic is 100
-    return 0.06;
+    return chainId === 1 ? 0.06 : 0.001;
   }
 
   isMatic(chainId) {
-    return /^(13(3|)7|80001)$/.test("" + chainId);
+    return /^(137|80001)$/.test("" + chainId);
   }
 
   async getCurrentStatus() {
@@ -245,6 +247,7 @@ export default class BuyTokens extends Base {
       this.setState({
         submitting: "Waiting for approval",
         error: undefined,
+        errorAdd: false,
       });
       const farm = this.getFarm();
       try {
@@ -281,6 +284,7 @@ export default class BuyTokens extends Base {
         submitting: "Waiting for validation",
         error: undefined,
         amountTaken: 0,
+        errorAdd: false,
       });
       let res = await this.request("authorize-purchase", "post", {
         amount,
@@ -312,6 +316,8 @@ export default class BuyTokens extends Base {
               Please do not leave/refresh the page
             </span>
           ),
+          ethTx: tx.hash,
+          ethNonce: nonce,
         });
         await tx.wait();
         this.setState({
@@ -329,7 +335,8 @@ export default class BuyTokens extends Base {
         const { mintingTx } = res;
         if (!mintingTx) {
           return this.setState({
-            error: "Purchase not found. Contact info@ndujalabs.com for support",
+            error: res.error,
+            errorAdd: true,
             submitting: undefined,
           });
         }
@@ -400,6 +407,9 @@ export default class BuyTokens extends Base {
       progress,
       progress2,
       error,
+      errorAdd,
+      ethTx,
+      ethNonce,
       minted,
       balance,
       checked,
@@ -563,7 +573,9 @@ export default class BuyTokens extends Base {
                     {minted < maxForSale ? (
                       <span>
                         Total supply: <b>{maxSupply}</b> | Left for sale:{" "}
-                        <b>{maxForSale - minted - 100}</b>
+                        <b>
+                          {maxForSale - minted - (chainId === 137 ? 100 : 50)}
+                        </b>
                         <br />
                         Price on Polygon: <b>{price}</b>{" "}
                         <span style={{ fontSize: "80%" }}> MATIC</span> | Price
@@ -701,238 +713,29 @@ export default class BuyTokens extends Base {
         {error ? (
           <Row>
             <Col>
-              <div className={"error centered"}>ERROR: {error}</div>{" "}
+              <div className={"error centered"} style={{ paddingTop: 24 }}>
+                ERROR: {error}
+                <br />
+                {errorAdd ? (
+                  <div style={{ fontWeight: "normal" }}>
+                    Please, contact support@ndujalabs.com reporting the
+                    following data:
+                    <br />
+                    <code>
+                      Transaction id: {ethTx}
+                      <br />
+                      Nonce: {ethNonce}
+                    </code>
+                  </div>
+                ) : null}
+              </div>
             </Col>
           </Row>
         ) : null}
-        {/*<Row>*/}
-        {/*  <Col lg={2} />*/}
-        {/*  <Col lg={8}>*/}
-        {/*    <h2 style={{ marginTop: 32 }}>*/}
-        {/*      Price evolution in <span style={{ fontSize: "80%" }}>MATIC</span>{" "}*/}
-        {/*      by tokenId*/}
-        {/*    </h2>*/}
-        {/*    <div className={"padded"}>*/}
-        {/*      <ProgressBar>*/}
-        {/*        <ProgressBar*/}
-        {/*          variant="warning"*/}
-        {/*          now={35}*/}
-        {/*          key={2}*/}
-        {/*          style={{*/}
-        {/*            textShadow: "0 0 3px white",*/}
-        {/*            backgroundImage:*/}
-        {/*              "linear-gradient(lightgreen, mediumspringgreen)",*/}
-        {/*            color: "black",*/}
-        {/*            fontWeight: "bold",*/}
-        {/*          }}*/}
-        {/*          label={"0"}*/}
-        {/*        />*/}
 
-        {/*        <ProgressBar*/}
-        {/*          variant="warning"*/}
-        {/*          now={25}*/}
-        {/*          key={2}*/}
-        {/*          style={{*/}
-        {/*            textShadow: "0 0 3px white",*/}
-        {/*            backgroundImage: "linear-gradient(yellow, gold)",*/}
-        {/*            color: "black",*/}
-        {/*            fontWeight: "bold",*/}
-        {/*          }}*/}
-        {/*          label={"100"}*/}
-        {/*        />*/}
-
-        {/*        <ProgressBar*/}
-        {/*          variant="warning"*/}
-        {/*          now={10}*/}
-        {/*          key={2}*/}
-        {/*          style={{*/}
-        {/*            textShadow: "0 0 3px white",*/}
-        {/*            backgroundImage: "linear-gradient(gold, orange)",*/}
-        {/*            color: "black",*/}
-        {/*            fontWeight: "bold",*/}
-        {/*          }}*/}
-        {/*          label={"200"}*/}
-        {/*        />*/}
-
-        {/*        <ProgressBar*/}
-        {/*          variant="warning"*/}
-        {/*          now={10}*/}
-        {/*          key={2}*/}
-        {/*          style={{*/}
-        {/*            textShadow: "0 0 3px white",*/}
-        {/*            backgroundImage: "linear-gradient(orange, crimson)",*/}
-        {/*            color: "black",*/}
-        {/*            fontWeight: "bold",*/}
-        {/*          }}*/}
-        {/*          label={"300"}*/}
-        {/*        />*/}
-
-        {/*        <ProgressBar*/}
-        {/*          variant="warning"*/}
-        {/*          now={10}*/}
-        {/*          key={2}*/}
-        {/*          style={{*/}
-        {/*            textShadow: "0 0 3px white",*/}
-        {/*            backgroundImage: "linear-gradient(crimson, brown)",*/}
-        {/*            color: "black",*/}
-        {/*            fontWeight: "bold",*/}
-        {/*          }}*/}
-        {/*          label={"400"}*/}
-        {/*        />*/}
-
-        {/*        <ProgressBar*/}
-        {/*          variant="warning"*/}
-        {/*          now={10}*/}
-        {/*          key={2}*/}
-        {/*          style={{*/}
-        {/*            textShadow: "0 0 3px white",*/}
-        {/*            backgroundImage: "linear-gradient(crimson, red)",*/}
-        {/*            color: "black",*/}
-        {/*            fontWeight: "bold",*/}
-        {/*          }}*/}
-        {/*          label={"500"}*/}
-        {/*        />*/}
-        {/*      </ProgressBar>*/}
-        {/*      /!*</div>*!/*/}
-
-        {/*      /!*<div className={"padded"}>*!/*/}
-        {/*      <ProgressBar>*/}
-        {/*        <ProgressBar*/}
-        {/*          variant="warning"*/}
-        {/*          now={35}*/}
-        {/*          key={2}*/}
-        {/*          style={{*/}
-        {/*            textShadow: "0 0 3px white",*/}
-        {/*            backgroundImage: "linear-gradient(#f0f0f0, #e0e0e0)",*/}
-        {/*            color: "black",*/}
-        {/*            fontWeight: "bold",*/}
-        {/*          }}*/}
-        {/*          label={"0-350"}*/}
-        {/*        />*/}
-
-        {/*        <ProgressBar*/}
-        {/*          variant="warning"*/}
-        {/*          now={25}*/}
-        {/*          key={2}*/}
-        {/*          style={{*/}
-        {/*            textShadow: "0 0 3px white",*/}
-        {/*            backgroundImage: "linear-gradient(#e8e8e8, #d8d8d8)",*/}
-        {/*            color: "black",*/}
-        {/*            fontWeight: "bold",*/}
-        {/*          }}*/}
-        {/*          label={"351-600"}*/}
-        {/*        />*/}
-
-        {/*        <ProgressBar*/}
-        {/*          variant="warning"*/}
-        {/*          now={10}*/}
-        {/*          key={2}*/}
-        {/*          style={{*/}
-        {/*            textShadow: "0 0 3px white",*/}
-        {/*            backgroundImage: "linear-gradient(#e0e0e0, #d0d0d0)",*/}
-        {/*            color: "black",*/}
-        {/*            fontWeight: "bold",*/}
-        {/*          }}*/}
-        {/*          label={"601-700"}*/}
-        {/*        />*/}
-
-        {/*        <ProgressBar*/}
-        {/*          variant="warning"*/}
-        {/*          now={10}*/}
-        {/*          key={2}*/}
-        {/*          style={{*/}
-        {/*            textShadow: "0 0 3px white",*/}
-        {/*            backgroundImage: "linear-gradient(#d8d8d8, #c0c0c0)",*/}
-        {/*            color: "black",*/}
-        {/*            fontWeight: "bold",*/}
-        {/*          }}*/}
-        {/*          label={"701-800"}*/}
-        {/*        />*/}
-
-        {/*        <ProgressBar*/}
-        {/*          variant="warning"*/}
-        {/*          now={10}*/}
-        {/*          key={2}*/}
-        {/*          style={{*/}
-        {/*            textShadow: "0 0 3px white",*/}
-        {/*            backgroundImage: "linear-gradient(#c8c8c8, #b8b8b8)",*/}
-        {/*            color: "black",*/}
-        {/*            fontWeight: "bold",*/}
-        {/*          }}*/}
-        {/*          label={"801-900"}*/}
-        {/*        />*/}
-
-        {/*        <ProgressBar*/}
-        {/*          variant="warning"*/}
-        {/*          now={10}*/}
-        {/*          key={2}*/}
-        {/*          style={{*/}
-        {/*            textShadow: "0 0 3px white",*/}
-        {/*            backgroundImage: "linear-gradient(#c0c0c0, #b0b0b0)",*/}
-        {/*            color: "black",*/}
-        {/*            fontWeight: "bold",*/}
-        {/*          }}*/}
-        {/*          label={"901-1000"}*/}
-        {/*        />*/}
-        {/*      </ProgressBar>*/}
-        {/*    </div>*/}
-        {/*  </Col>*/}
-        {/*  <Col lg={2} />*/}
-        {/*</Row>*/}
-        {/*
-        /// ADMIN
-        */}
-
-        {/*{isOwner ? (*/}
-        {/*  <Row style={{ marginTop: 48 }}>*/}
-        {/*    <Col style={{ textAlign: "right" }}>*/}
-        {/*      <FormGroup*/}
-        {/*        name={"amount2"}*/}
-        {/*        thiz={this}*/}
-        {/*        placeholder={"Amount"}*/}
-        {/*        divCls={"shortInput floatRight"}*/}
-        {/*      />*/}
-        {/*      <FormGroup*/}
-        {/*        name={"address"}*/}
-        {/*        thiz={this}*/}
-        {/*        placeholder={"Address"}*/}
-        {/*        divCls={"shortInput floatRight"}*/}
-        {/*      />*/}
-        {/*    </Col>*/}
-        {/*    <Col>*/}
-        {/*      <Button size={"lg"} onClick={this.withdraw}>*/}
-        {/*        Get!*/}
-        {/*      </Button>*/}
-        {/*    </Col>*/}
-        {/*  </Row>*/}
-        {/*) : null}*/}
-
-        {/*{isOwner ? (*/}
-        {/*  <Row style={{ marginTop: 48 }}>*/}
-        {/*    <Col style={{ textAlign: "right" }}>*/}
-        {/*      <FormGroup*/}
-        {/*        name={"quantity"}*/}
-        {/*        thiz={this}*/}
-        {/*        placeholder={"Quantity"}*/}
-        {/*        divCls={"shortInput floatRight"}*/}
-        {/*      />*/}
-        {/*      <FormGroup*/}
-        {/*        name={"index"}*/}
-        {/*        thiz={this}*/}
-        {/*        placeholder={"Index"}*/}
-        {/*        divCls={"shortInput floatRight"}*/}
-        {/*      />*/}
-        {/*    </Col>*/}
-        {/*    <Col>*/}
-        {/*      <Button size={"lg"} onClick={this.distribute}>*/}
-        {/*        Distribute extra tokens*/}
-        {/*      </Button>*/}
-        {/*    </Col>*/}
-        {/*  </Row>*/}
-        {/*) : null}*/}
         <Row>
           <Col>
-            <div style={{ height: 100 }} />
+            <div style={{ height: 30 }} />
           </Col>
         </Row>
       </div>
