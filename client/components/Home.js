@@ -27,7 +27,7 @@ export default class Home extends Base {
   }
 
   render() {
-    const stage = /stage/.test(window.location.search);
+    // const stage = /stage/.test(window.location.search);
 
     const { connectedWallet } = this.Store;
     return (
@@ -52,11 +52,7 @@ export default class Home extends Base {
         </MobileView>
         <BrowserView>
           {connectedWallet ? (
-            stage ? (
-              <BuyTokens Store={this.Store} setStore={this.setStore} />
-            ) : (
-              <h2>Sale suspended for maintainance</h2>
-            )
+            <BuyTokens Store={this.Store} setStore={this.setStore} />
           ) : (
             <Row>
               <Col>
