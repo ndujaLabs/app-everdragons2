@@ -94,7 +94,7 @@ const utils = {
       throw new Error("Not enough tokens left :-(");
     }
 
-    const scriptPath = path.resolve(__dirname, "../../send-tokens.sh");
+    const scriptPath = path.resolve(__dirname, "../../sendTokens.js");
     const chain =
       chainId === "137"
         ? "matic"

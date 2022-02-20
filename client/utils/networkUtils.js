@@ -33,6 +33,7 @@ const network = {
   },
 
   decodeMetamaskError(message) {
+    console.error(message);
     try {
       if (/denied transaction signature/.test(message)) {
         return ["You denied transaction signature :-("];
