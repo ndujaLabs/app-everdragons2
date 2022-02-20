@@ -627,8 +627,8 @@ export default class BuyTokens extends Base {
                     label={"here"}
                   />
                   .<br />
-                  We also sent you 1{" "}
-                  <span style={{ fontSize: "80%" }}>MATIC</span>. Enjoy it :)
+                  We will also send you 1{" "}
+                  <span style={{ fontSize: "80%" }}>MATIC</span> later. Enjoy it :)
                 </div>
               </div>
             </Col>
