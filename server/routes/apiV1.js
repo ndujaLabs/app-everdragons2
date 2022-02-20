@@ -88,7 +88,7 @@ router.post("/mint-token", async (req, res) => {
       mintingTx,
     });
   } catch (e) {
-    console.error(e);
+    // console.error(e);
     res.json({
       success: false,
       error: e.message,
