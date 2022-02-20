@@ -109,7 +109,7 @@ const utils = {
         ).toString()
       );
     } catch (e) {
-      console.error(e)
+      console.error(e);
       throw new Error("Transaction not created");
     }
     if (/^0x[a-f0-9]{64}/i.test(tx)) {
