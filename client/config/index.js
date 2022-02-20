@@ -1,6 +1,8 @@
 let isDev;
 if (typeof window !== "undefined") {
-  isDev = /localhost/.test(window.location.host) || /stage/.test(window.location.pathname)
+  isDev =
+    /localhost/.test(window.location.host) ||
+    /stage/.test(window.location.search);
 } else if (typeof process !== undefined && process.env) {
   isDev = true;
 }
