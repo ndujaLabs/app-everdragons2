@@ -582,7 +582,7 @@ export default class BuyTokens extends Base {
                       <span>
                         Total supply: <b>{maxSupply}</b> | Left for sale:{" "}
                         <b>
-                          {maxForSale - minted - (chainId === 137 ? 100 : 50)}
+                          {maxForSale - minted - (chainId === 137 || chainId === 1 ? 100 : 50)}
                         </b>
                         <br />
                         Price on Polygon: <b>{price}</b>{" "}

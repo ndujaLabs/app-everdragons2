@@ -65,15 +65,15 @@ export default class Home extends Base {
                     <br />
                     Click{" "}
                     <Ab
-                      label={"here to switch to Polygon PoS"}
+                      label={"here"}
                       onClick={() => switchTo(137)}
-                    />
+                    />{" "}to switch to Polygon PoS
                     <br />
                     or{" "}
                     <Ab
-                      label={"here to switch to Ethereum Mainnet"}
+                      label={"here"}
                       onClick={() => switchTo(1)}
-                    />
+                    />{" "}to switch to Ethereum Mainnet
                   </div>
                 </Col>
                 <Col lg={2} />

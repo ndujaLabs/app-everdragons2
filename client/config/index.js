@@ -1,8 +1,6 @@
 let isDev;
 if (typeof window !== "undefined") {
-  isDev =
-    /localhost/.test(window.location.host) ||
-    /stage/.test(window.location.href);
+  isDev = /stage/.test(window.location.href);
 } else if (typeof process !== undefined && process.env) {
   isDev = true;
 }
@@ -46,7 +44,8 @@ const config = {
       rpcUrls: ["https://polygon-rpc.com"],
       blockExplorerUrls: ["https://polygonscan.com"],
     },
-    80001: {
+    80001: isDev
+      ? {
       chainId: "0x" + Number(80001).toString(16),
       chainName: "Mumbai Polygon Testnet",
       rpcUrls: ["https://rpc-mumbai.matic.today"],
@@ -56,7 +55,7 @@ const config = {
         symbol: "MATIC",
         decimals: 18,
       },
-    },
+    } : null,
     1337: isDev
       ? {
           chainId: "0x" + Number(1337).toString(16),
@@ -70,7 +69,8 @@ const config = {
           blockExplorerUrls: [],
         }
       : undefined,
-    42: {
+    42: isDev
+      ? {
       chainId: "0x" + Number(42).toString(16),
       chainName: "Kovan",
       nativeCurrency: {
@@ -80,7 +80,7 @@ const config = {
       },
       rpcUrls: ["https://kovan.etherscan.io"],
       blockExplorerUrls: [],
-    },
+    } : null,
   },
   openSeaLink: {
     80001:
