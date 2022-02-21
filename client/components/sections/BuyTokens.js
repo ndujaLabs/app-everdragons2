@@ -485,7 +485,7 @@ export default class BuyTokens extends Base {
               is negligible and the transaction is fast and smooth.
               <br />
               {this.isMatic(chainId) ? (
-                <div>Use the font below to proceed</div>
+                <div>Use the form below to proceed</div>
               ) : (
                 <Ab
                   label={"Click here to switch/configure it"}
