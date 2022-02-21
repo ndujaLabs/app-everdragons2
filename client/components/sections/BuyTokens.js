@@ -135,7 +135,7 @@ export default class BuyTokens extends Base {
   getEtherPrice() {
     const { chainId } = this.Store;
     // price on Ethereum is 0.06, when Matic is 100
-    return chainId === 1 ? 0.06 : 0.001;
+    return chainId === 1 || chainId === 137 ? 0.06 : 0.001;
   }
 
   isMatic(chainId) {
