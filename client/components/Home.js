@@ -13,6 +13,8 @@ import * as Scroll from "react-scroll";
 import { Container, Row, Col } from "react-bootstrap";
 
 import Base from "./Base";
+import Ab from "./Ab";
+import { switchTo } from "../utils/networkUtils";
 // import Ab from "./Ab";
 
 export default class Home extends Base {
@@ -29,7 +31,7 @@ export default class Home extends Base {
   render() {
     // const stage = /stage/.test(window.location.search);
 
-    const { connectedWallet } = this.Store;
+    const { connectedWallet, connectedNetwork } = this.Store;
     return (
       <Container style={{ marginTop: 100 }}>
         <Row>
@@ -52,7 +54,30 @@ export default class Home extends Base {
         </MobileView>
         <BrowserView>
           {connectedWallet ? (
-            <BuyTokens Store={this.Store} setStore={this.setStore} />
+            connectedNetwork ? (
+              <BuyTokens Store={this.Store} setStore={this.setStore} />
+            ) : (
+              <Row>
+                <Col lg={2} />
+                <Col lg={8}>
+                  <div className={"alert centered"}>
+                    UNSUPPORTED NETWORK.
+                    <br />
+                    Click{" "}
+                    <Ab
+                      label={"here to switch to Polygon PoS"}
+                      onClick={() => switchTo(137)}
+                    /><br/>
+                    or{" "}
+                    <Ab
+                      label={"here to switch to Ethereum Mainnet"}
+                      onClick={() => switchTo(1)}
+                    />
+                  </div>
+                </Col>
+                <Col lg={2} />
+              </Row>
+            )
           ) : (
             <Row>
               <Col>

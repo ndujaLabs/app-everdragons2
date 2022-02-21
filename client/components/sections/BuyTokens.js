@@ -145,17 +145,24 @@ export default class BuyTokens extends Base {
   async getCurrentStatus() {
     await this.waitForWeb3();
     const { chainId } = this.Store;
-    if (!this.isMatic(chainId)) {
-      const res = await this.request("/get-current-status", "get", undefined, {
-        chainId,
-      });
-      if (res.success) {
-        this.setStore({
-          currentTotalSupply: res.totalSupply,
-        });
+    if (this.Store.connectedNetwork) {
+      if (!this.isMatic(chainId)) {
+        const res = await this.request(
+          "/get-current-status",
+          "get",
+          undefined,
+          {
+            chainId,
+          }
+        );
+        if (res.success) {
+          this.setStore({
+            currentTotalSupply: res.totalSupply,
+          });
+        }
       }
+      this.getValues();
     }
-    this.getValues();
   }
 
   async getValues() {
@@ -423,8 +430,6 @@ export default class BuyTokens extends Base {
       reserved,
     } = this.state;
 
-    console.log("price", price);
-
     const currency = this.isMatic(this.Store.chainId) ? "MATIC" : "ETH";
     const buyFunc = this.isMatic(this.Store.chainId) ? this.buy : this.buyInEth;
 
@@ -442,16 +447,19 @@ export default class BuyTokens extends Base {
 
     return (
       <div>
-        {chainId === 80001 ? (
+        {chainId === 80001 || chainId === 42 ? (
           <Row>
             <Col lg={2} />
             <Col lg={8}>
               <div className={"alert centered"}>
-                YOU ARE USING THE TEST APP ON MUMBAI.
+                YOU ARE USING THE TEST APP ON{" "}
+                {chainId === 80001 ? "MUMBAI" : "KOVAN"}.
                 <br />
                 <Ab
-                  label={"Click here to switch to Polygon PoS"}
-                  onClick={() => switchTo(137)}
+                  label={`Click here to switch to ${
+                    chainId === 80001 ? "Polygon PoS" : "Ethereum Mainner"
+                  }`}
+                  onClick={() => switchTo(chainId === 80001 ? 137 : 1)}
                 />
               </div>
             </Col>
