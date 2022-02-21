@@ -457,7 +457,7 @@ export default class BuyTokens extends Base {
                 <br />
                 <Ab
                   label={`Click here to switch to ${
-                    chainId === 80001 ? "Polygon PoS" : "Ethereum Mainner"
+                    chainId === 80001 ? "Polygon PoS" : "Ethereum Mainnet"
                   }`}
                   onClick={() => switchTo(chainId === 80001 ? 137 : 1)}
                 />
