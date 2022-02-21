@@ -442,22 +442,22 @@ export default class BuyTokens extends Base {
 
     return (
       <div>
-        {/*{chainId === 80001 ? (*/}
-        {/*  <Row>*/}
-        {/*    <Col lg={2} />*/}
-        {/*    <Col lg={8}>*/}
-        {/*      <div className={"alert centered"}>*/}
-        {/*        YOU ARE USING THE TEST APP ON MUMBAI.*/}
-        {/*        <br />*/}
-        {/*        <Ab*/}
-        {/*          label={"Click here to switch to Polygon PoS"}*/}
-        {/*          onClick={() => switchTo(137)}*/}
-        {/*        />*/}
-        {/*      </div>*/}
-        {/*    </Col>*/}
-        {/*    <Col lg={2} />*/}
-        {/*  </Row>*/}
-        {/*) : null}*/}
+        {chainId === 80001 ? (
+          <Row>
+            <Col lg={2} />
+            <Col lg={8}>
+              <div className={"alert centered"}>
+                YOU ARE USING THE TEST APP ON MUMBAI.
+                <br />
+                <Ab
+                  label={"Click here to switch to Polygon PoS"}
+                  onClick={() => switchTo(137)}
+                />
+              </div>
+            </Col>
+            <Col lg={2} />
+          </Row>
+        ) : null}
         <Row>
           <Col>
             <div className={"legenda centered"}>
@@ -628,7 +628,8 @@ export default class BuyTokens extends Base {
                   />
                   .<br />
                   We will also send you 1{" "}
-                  <span style={{ fontSize: "80%" }}>MATIC</span> later. Enjoy it :)
+                  <span style={{ fontSize: "80%" }}>MATIC</span> later. Enjoy it
+                  :)
                 </div>
               </div>
             </Col>
