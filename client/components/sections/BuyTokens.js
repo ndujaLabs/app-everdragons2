@@ -32,12 +32,12 @@ export default class BuyTokens extends Base {
       ethPrice: 0,
       progress2: 0,
       remaining: 650,
-      deadline: (new Date("2022-05-01T00:00:00Z")).getTime(),
+      deadline: new Date("2022-05-01T00:00:00Z").getTime(),
       // deadline: Date.now() + 3400 * 1000,
       // deadline: Date.now(),
       saleEnded: false,
       saleEnding: false,
-      countDown: -1,
+      countDown: undefined,
     };
 
     this.bindMany([
@@ -55,7 +55,22 @@ export default class BuyTokens extends Base {
       "getCurrentStatus",
       "getEtherPrice",
       "monitorDate",
+      "endingIn",
     ]);
+  }
+
+  endingIn() {
+    const { countDown } = this.state;
+    const days = Math.floor(countDown / (24 * 3600 * 1000));
+    const hours = Math.floor((countDown / (3600 * 1000)) % 24);
+    const minutes = Math.floor((countDown / (60 * 1000)) % 60);
+    const seconds = Math.floor((countDown / 1000) % 60);
+    return (
+      (days > 0 ? `${days} days, ` : "") +
+      (hours > 0 ? `${hours} hours, ` : "") +
+      (minutes > 0 ? `${minutes} minutes, and ` : "") +
+      `${seconds} seconds`
+    );
   }
 
   componentDidMount() {
@@ -67,10 +82,11 @@ export default class BuyTokens extends Base {
     const { deadline } = this.state;
     const current = Date.now();
     const countDown = deadline - current;
+    this.setState({ countDown });
     if (current > deadline) {
-      this.setState({ saleEnded: true, countDown });
+      this.setState({ saleEnded: true });
     } else if (current > deadline - 3600 * 1000) {
-      this.setState({ saleEnding: true, countDown });
+      this.setState({ saleEnding: true });
     }
     this.setTimeout(this.monitorDate, 1000);
   }
@@ -480,7 +496,6 @@ export default class BuyTokens extends Base {
       remaining,
       reserved,
       saleEnded,
-      saleEnding,
       countDown,
     } = this.state;
 
@@ -532,8 +547,7 @@ export default class BuyTokens extends Base {
             <Col lg={2} />
             <Col lg={8}>
               <div className={"countDown"}>
-                The sale is ending in{" "}
-                {Math.round(countDown / 60000)} minutes and {Math.round((countDown / 1000) % 60)} seconds
+                The sale is ending in {this.endingIn()}
               </div>
             </Col>
             <Col lg={2} />
