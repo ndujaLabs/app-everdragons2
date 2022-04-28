@@ -63,17 +63,11 @@ export default class Home extends Base {
                   <div className={"alert centered"}>
                     UNSUPPORTED NETWORK.
                     <br />
-                    Click{" "}
-                    <Ab
-                      label={"here"}
-                      onClick={() => switchTo(137)}
-                    />{" "}to switch to Polygon PoS
+                    Click <Ab label={"here"} onClick={() => switchTo(137)} /> to
+                    switch to Polygon PoS
                     <br />
-                    or{" "}
-                    <Ab
-                      label={"here"}
-                      onClick={() => switchTo(1)}
-                    />{" "}to switch to Ethereum Mainnet
+                    or <Ab label={"here"} onClick={() => switchTo(1)} /> to
+                    switch to Ethereum Mainnet
                   </div>
                 </Col>
                 <Col lg={2} />

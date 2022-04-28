@@ -46,16 +46,17 @@ const config = {
     },
     80001: isDev
       ? {
-      chainId: "0x" + Number(80001).toString(16),
-      chainName: "Mumbai Polygon Testnet",
-      rpcUrls: ["https://rpc-mumbai.matic.today"],
-      blockExplorerUrls: ["https://mumbai-explorer.matic.today"],
-      nativeCurrency: {
-        name: "MATIC",
-        symbol: "MATIC",
-        decimals: 18,
-      },
-    } : null,
+          chainId: "0x" + Number(80001).toString(16),
+          chainName: "Mumbai Polygon Testnet",
+          rpcUrls: ["https://rpc-mumbai.matic.today"],
+          blockExplorerUrls: ["https://mumbai-explorer.matic.today"],
+          nativeCurrency: {
+            name: "MATIC",
+            symbol: "MATIC",
+            decimals: 18,
+          },
+        }
+      : null,
     1337: isDev
       ? {
           chainId: "0x" + Number(1337).toString(16),
@@ -71,16 +72,17 @@ const config = {
       : undefined,
     42: isDev
       ? {
-      chainId: "0x" + Number(42).toString(16),
-      chainName: "Kovan",
-      nativeCurrency: {
-        name: "ETH",
-        symbol: "ETH",
-        decimals: 18,
-      },
-      rpcUrls: ["https://kovan.etherscan.io"],
-      blockExplorerUrls: [],
-    } : null,
+          chainId: "0x" + Number(42).toString(16),
+          chainName: "Kovan",
+          nativeCurrency: {
+            name: "ETH",
+            symbol: "ETH",
+            decimals: 18,
+          },
+          rpcUrls: ["https://kovan.etherscan.io"],
+          blockExplorerUrls: [],
+        }
+      : null,
   },
   openSeaLink: {
     80001:

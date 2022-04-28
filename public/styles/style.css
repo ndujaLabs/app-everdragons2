@@ -1034,3 +1034,11 @@ input::placeholder {
     padding: 20px 0 0;
     margin-bottom: -12px;
 }
+
+.countDown {
+    background: black;
+    padding: 12px;
+    color: white;
+    border-radius: 12px;
+    text-align: center;
+}

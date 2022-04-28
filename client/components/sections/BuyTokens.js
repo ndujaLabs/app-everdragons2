@@ -32,6 +32,12 @@ export default class BuyTokens extends Base {
       ethPrice: 0,
       progress2: 0,
       remaining: 650,
+      deadline: (new Date("2022-05-01T00:00:00Z")).getTime(),
+      // deadline: Date.now() + 3400 * 1000,
+      // deadline: Date.now(),
+      saleEnded: false,
+      saleEnding: false,
+      countDown: -1,
     };
 
     this.bindMany([
@@ -48,11 +54,25 @@ export default class BuyTokens extends Base {
       "buyInEth",
       "getCurrentStatus",
       "getEtherPrice",
+      "monitorDate",
     ]);
   }
 
   componentDidMount() {
+    this.monitorDate();
     this.getCurrentStatus();
+  }
+
+  monitorDate() {
+    const { deadline } = this.state;
+    const current = Date.now();
+    const countDown = deadline - current;
+    if (current > deadline) {
+      this.setState({ saleEnded: true, countDown });
+    } else if (current > deadline - 3600 * 1000) {
+      this.setState({ saleEnding: true, countDown });
+    }
+    this.setTimeout(this.monitorDate, 1000);
   }
 
   checkAmount(name, value) {
@@ -249,7 +269,28 @@ export default class BuyTokens extends Base {
   }
 
   async buy() {
-    const amount = this.state.amount;
+    const { amount, saleEnded, saleEnding, countDown } = this.state;
+    if (saleEnded) {
+      return this.setState({
+        error: "Whoops, sale's ended",
+        submitting: undefined,
+      });
+    } else if (saleEnding) {
+      const end = Math.round(countDown / 60000);
+      if (
+        !confirm(
+          `Be careful, the sale is ending in ${
+            end > 0
+              ? `${end} minutes`
+              : `${Math.round(countDown / 1000)} seconds`
+          }. Be careful if you are too close to the end of the sale. Are you sure you want to proceed?`
+        )
+      ) {
+        return this.setState({
+          submitting: undefined,
+        });
+      }
+    }
     if (amount > 0 && amount <= 10) {
       this.setState({
         submitting: "Waiting for approval",
@@ -285,7 +326,17 @@ export default class BuyTokens extends Base {
   }
 
   async buyInEth() {
-    const amount = this.state.amount;
+    const { amount, saleEnded, saleEnding } = this.state;
+    if (saleEnded) {
+      return this.setState({
+        error: "Whoops, sale's ended",
+        submitting: undefined,
+      });
+    } else if (saleEnding) {
+      alert(
+        "Be careful, the sale is ending soon. Do  not proceed if you are too close to the end of the sale"
+      );
+    }
     if (amount > 0 && amount <= 10) {
       this.setState({
         submitting: "Waiting for validation",
@@ -428,6 +479,9 @@ export default class BuyTokens extends Base {
       ethPrice,
       remaining,
       reserved,
+      saleEnded,
+      saleEnding,
+      countDown,
     } = this.state;
 
     const currency = this.isMatic(this.Store.chainId) ? "MATIC" : "ETH";
@@ -471,6 +525,22 @@ export default class BuyTokens extends Base {
             <div className={"legenda centered"}>
               E2GT are ERC721 tokens on the Polygon PoS Network.
             </div>
+          </Col>
+        </Row>
+        {!saleEnded && countDown ? (
+          <Row>
+            <Col lg={2} />
+            <Col lg={8}>
+              <div className={"countDown"}>
+                The sale is ending in{" "}
+                {Math.round(countDown / 60000)} minutes and {Math.round((countDown / 1000) % 60)} seconds
+              </div>
+            </Col>
+            <Col lg={2} />
+          </Row>
+        ) : null}
+        <Row>
+          <Col>
             <div className={"roboto centered underLegenda"}>
               You can get them in two ways:
             </div>
@@ -561,28 +631,19 @@ export default class BuyTokens extends Base {
                   now={remaining}
                   key={2}
                 />
-                {/*{progress2 ? (*/}
-                {/*  <ProgressBar*/}
-                {/*    now={progress2}*/}
-                {/*    key={3}*/}
-                {/*    style={{*/}
-                {/*      textShadow: "0 0 3px white",*/}
-                {/*      backgroundImage:*/}
-                {/*        "linear-gradient(lightgreen, mediumspringgreen)",*/}
-                {/*      color: "black",*/}
-                {/*      fontWeight: "bold",*/}
-                {/*    }}*/}
-                {/*  />*/}
-                {/*) : null}*/}
               </ProgressBar>
               {price ? (
                 <div>
                   <div className={"underProgress centered"}>
-                    {minted < maxForSale ? (
+                    {saleEnded ? (
+                      "Sale ended on May 1st, 2002 at 12 am UTC"
+                    ) : minted < maxForSale ? (
                       <span>
                         Total supply: <b>{maxSupply}</b> | Left for sale:{" "}
                         <b>
-                          {maxForSale - minted - (chainId === 137 || chainId === 1 ? 100 : 50)}
+                          {maxForSale -
+                            minted -
+                            (chainId === 137 || chainId === 1 ? 100 : 50)}
                         </b>
                         <br />
                         Price on Polygon: <b>{price}</b>{" "}
@@ -666,7 +727,7 @@ export default class BuyTokens extends Base {
           </Row>
         ) : null}
 
-        {minted < maxForSale ? (
+        {!saleEnded && minted < maxForSale ? (
           <Row>
             <Col style={{ textAlign: "right" }}>
               <FormGroup
