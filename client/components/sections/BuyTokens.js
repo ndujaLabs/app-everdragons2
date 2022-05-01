@@ -650,7 +650,7 @@ export default class BuyTokens extends Base {
                 <div>
                   <div className={"underProgress centered"}>
                     {saleEnded ? (
-                      "Sale ended on May 1st, 2002 at 12 am UTC"
+                      "Sale ended on May 1st, 2022 at 12 am UTC"
                     ) : minted < maxForSale ? (
                       <span>
                         Total supply: <b>{maxSupply}</b> | Left for sale:{" "}
