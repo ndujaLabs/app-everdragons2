@@ -221,7 +221,7 @@ export default class BuyTokens extends Base {
       const nextTokenId = (await farm.nextTokenId()).toNumber();
       const price = ethers.utils.formatEther(await farm.price());
       const ethPrice = this.getEtherPrice();
-      const minted = nextTokenId - 351;
+      const minted = await Everdragons2Genesis.totalSupply();
       const base = maxClaimable / 10;
       let closed = await farm.saleClosedAt();
       if (closed !== 0) {
